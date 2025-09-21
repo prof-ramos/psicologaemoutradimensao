@@ -57,6 +57,42 @@ def resolve_geonames_username(subject_geonames_username):
         return settings.geonames_username if settings.geonames_username else None
     return None
 
+
+def create_astrological_subject(
+    subject,
+    name_override=None,
+    zodiac_type_override=None,
+    sidereal_mode_override=None,
+    houses_system_identifier_override=None,
+    perspective_type_override=None,
+):
+    """
+    Helper function to create an AstrologicalSubject from a subject model.
+    Allows overriding certain fields for special cases like transit subjects.
+    """
+    geo_username = resolve_geonames_username(subject.geonames_username)
+    geo_online = bool(geo_username)
+
+    return AstrologicalSubject(
+        name=name_override or subject.name,
+        year=subject.year,
+        month=subject.month,
+        day=subject.day,
+        hour=subject.hour,
+        minute=subject.minute,
+        city=subject.city,
+        nation=subject.nation,
+        lat=subject.latitude,
+        lng=subject.longitude,
+        tz_str=subject.timezone,
+        zodiac_type=zodiac_type_override or subject.zodiac_type,  # type: ignore
+        sidereal_mode=sidereal_mode_override or subject.sidereal_mode,
+        houses_system_identifier=houses_system_identifier_override or subject.houses_system_identifier,  # type: ignore
+        perspective_type=perspective_type_override or subject.perspective_type,  # type: ignore
+        geonames_username=geo_username,
+        online=geo_online,
+    )
+
 @router.get("/api/v4/health", response_description="Health check", include_in_schema=False)
 async def health(request: Request) -> JSONResponse:
     """
@@ -147,29 +183,7 @@ async def birth_data(birth_data_request: BirthDataRequestModel, request: Request
     subject = birth_data_request.subject
 
     try:
-        # Resolve geonames username from request or environment settings
-        geo_username = resolve_geonames_username(subject.geonames_username)
-        geo_online = bool(geo_username)
-        
-        astrological_subject = AstrologicalSubject(
-            name=subject.name,
-            year=subject.year,
-            month=subject.month,
-            day=subject.day,
-            hour=subject.hour,
-            minute=subject.minute,
-            city=subject.city,
-            nation=subject.nation,
-            lat=subject.latitude,
-            lng=subject.longitude,
-            tz_str=subject.timezone,
-            zodiac_type=subject.zodiac_type, # type: ignore
-            sidereal_mode=subject.sidereal_mode,
-            houses_system_identifier=subject.houses_system_identifier, # type: ignore
-            perspective_type=subject.perspective_type, # type: ignore
-            geonames_username=geo_username,
-            online=geo_online,
-        )
+        astrological_subject = create_astrological_subject(subject)
 
         data = astrological_subject.model().model_dump()
 
@@ -203,29 +217,7 @@ async def birth_chart(request_body: BirthChartRequestModel, request: Request):
     subject = request_body.subject
 
     try:
-        # Resolve geonames username from request or environment settings
-        geo_username = resolve_geonames_username(subject.geonames_username)
-        geo_online = bool(geo_username)
-        
-        astrological_subject = AstrologicalSubject(
-            name=subject.name,
-            year=subject.year,
-            month=subject.month,
-            day=subject.day,
-            hour=subject.hour,
-            minute=subject.minute,
-            city=subject.city,
-            nation=subject.nation,
-            lat=subject.latitude,
-            lng=subject.longitude,
-            tz_str=subject.timezone,
-            zodiac_type=subject.zodiac_type, # type: ignore
-            sidereal_mode=subject.sidereal_mode,
-            houses_system_identifier=subject.houses_system_identifier, # type: ignore
-            perspective_type=subject.perspective_type, # type: ignore
-            geonames_username=geo_username,
-            online=geo_online,
-        )
+        astrological_subject = create_astrological_subject(subject)
 
         data = astrological_subject.model().model_dump()
 
@@ -280,53 +272,8 @@ async def synastry_chart(synastry_chart_request: SynastryChartRequestModel, requ
     second_subject = synastry_chart_request.second_subject
 
     try:
-        # Resolve geonames username from request or environment settings
-        first_geo_username = resolve_geonames_username(first_subject.geonames_username)
-        first_geo_online = bool(first_geo_username)
-        
-        first_astrological_subject = AstrologicalSubject(
-            name=first_subject.name,
-            year=first_subject.year,
-            month=first_subject.month,
-            day=first_subject.day,
-            hour=first_subject.hour,
-            minute=first_subject.minute,
-            city=first_subject.city,
-            nation=first_subject.nation,
-            lat=first_subject.latitude,
-            lng=first_subject.longitude,
-            tz_str=first_subject.timezone,
-            zodiac_type=first_subject.zodiac_type, # type: ignore
-            sidereal_mode=first_subject.sidereal_mode,
-            houses_system_identifier=first_subject.houses_system_identifier, # type: ignore
-            perspective_type=first_subject.perspective_type, # type: ignore
-            geonames_username=first_geo_username,
-            online=first_geo_online,
-        )
-
-        # Resolve geonames username from request or environment settings
-        second_geo_username = resolve_geonames_username(second_subject.geonames_username)
-        second_geo_online = bool(second_geo_username)
-        
-        second_astrological_subject = AstrologicalSubject(
-            name=second_subject.name,
-            year=second_subject.year,
-            month=second_subject.month,
-            day=second_subject.day,
-            hour=second_subject.hour,
-            minute=second_subject.minute,
-            city=second_subject.city,
-            nation=second_subject.nation,
-            lat=second_subject.latitude,
-            lng=second_subject.longitude,
-            tz_str=second_subject.timezone,
-            zodiac_type=second_subject.zodiac_type, # type: ignore
-            sidereal_mode=second_subject.sidereal_mode,
-            houses_system_identifier=second_subject.houses_system_identifier, # type: ignore
-            perspective_type=second_subject.perspective_type, # type: ignore
-            geonames_username=second_geo_username,
-            online=second_geo_online,
-        )
+        first_astrological_subject = create_astrological_subject(first_subject)
+        second_astrological_subject = create_astrological_subject(second_subject)
 
         kerykeion_chart = KerykeionChartSVG(
             first_astrological_subject,
@@ -383,52 +330,14 @@ async def transit_chart(transit_chart_request: TransitChartRequestModel, request
     second_subject = transit_chart_request.transit_subject
 
     try:
-        # Resolve geonames username from request or environment settings for first subject
-        first_geo_username = resolve_geonames_username(first_subject.geonames_username)
-        first_geo_online = bool(first_geo_username)
-        
-        first_astrological_subject = AstrologicalSubject(
-            name=first_subject.name,
-            year=first_subject.year,
-            month=first_subject.month,
-            day=first_subject.day,
-            hour=first_subject.hour,
-            minute=first_subject.minute,
-            city=first_subject.city,
-            nation=first_subject.nation,
-            lat=first_subject.latitude,
-            lng=first_subject.longitude,
-            tz_str=first_subject.timezone,
-            zodiac_type=first_subject.zodiac_type, # type: ignore
-            sidereal_mode=first_subject.sidereal_mode,
-            houses_system_identifier=first_subject.houses_system_identifier, # type: ignore
-            perspective_type=first_subject.perspective_type, # type: ignore
-            geonames_username=first_geo_username,
-            online=first_geo_online,
-        )
-
-        # Resolve geonames username from request or environment settings for transit subject
-        transit_geo_username = resolve_geonames_username(second_subject.geonames_username)
-        transit_geo_online = bool(transit_geo_username)
-        
-        second_astrological_subject = AstrologicalSubject(
-            name="Transit",
-            year=second_subject.year,
-            month=second_subject.month,
-            day=second_subject.day,
-            hour=second_subject.hour,
-            minute=second_subject.minute,
-            city=second_subject.city,
-            nation=second_subject.nation,
-            lat=second_subject.latitude,
-            lng=second_subject.longitude,
-            tz_str=second_subject.timezone,
-            zodiac_type=first_astrological_subject.zodiac_type, # type: ignore
-            sidereal_mode=first_subject.sidereal_mode,
-            houses_system_identifier=first_subject.houses_system_identifier, # type: ignore
-            perspective_type=first_subject.perspective_type, # type: ignore
-            geonames_username=transit_geo_username,
-            online=transit_geo_online,
+        first_astrological_subject = create_astrological_subject(first_subject)
+        second_astrological_subject = create_astrological_subject(
+            second_subject,
+            name_override="Transit",
+            zodiac_type_override=first_astrological_subject.zodiac_type,
+            sidereal_mode_override=first_subject.sidereal_mode,
+            houses_system_identifier_override=first_subject.houses_system_identifier,
+            perspective_type_override=first_subject.perspective_type,
         )
 
         kerykeion_chart = KerykeionChartSVG(
@@ -486,52 +395,14 @@ async def transit_aspects_data(transit_chart_request: TransitChartRequestModel, 
     second_subject = transit_chart_request.transit_subject
 
     try:
-        # Resolve geonames username from request or environment settings for first subject
-        first_geo_username = resolve_geonames_username(first_subject.geonames_username)
-        first_geo_online = bool(first_geo_username)
-        
-        first_astrological_subject = AstrologicalSubject(
-            name=first_subject.name,
-            year=first_subject.year,
-            month=first_subject.month,
-            day=first_subject.day,
-            hour=first_subject.hour,
-            minute=first_subject.minute,
-            city=first_subject.city,
-            nation=first_subject.nation,
-            lat=first_subject.latitude,
-            lng=first_subject.longitude,
-            tz_str=first_subject.timezone,
-            zodiac_type=first_subject.zodiac_type, # type: ignore
-            sidereal_mode=first_subject.sidereal_mode,
-            houses_system_identifier=first_subject.houses_system_identifier, # type: ignore
-            perspective_type=first_subject.perspective_type, # type: ignore
-            geonames_username=first_geo_username,
-            online=first_geo_online,
-        )
-
-        # Resolve geonames username from request or environment settings for transit subject
-        transit_geo_username = resolve_geonames_username(second_subject.geonames_username)
-        transit_geo_online = bool(transit_geo_username)
-        
-        second_astrological_subject = AstrologicalSubject(
-            name="Transit",
-            year=second_subject.year,
-            month=second_subject.month,
-            day=second_subject.day,
-            hour=second_subject.hour,
-            minute=second_subject.minute,
-            city=second_subject.city,
-            nation=second_subject.nation,
-            lat=second_subject.latitude,
-            lng=second_subject.longitude,
-            tz_str=second_subject.timezone,
-            zodiac_type=first_astrological_subject.zodiac_type, # type: ignore
-            sidereal_mode=first_subject.sidereal_mode,
-            houses_system_identifier=first_subject.houses_system_identifier, # type: ignore
-            perspective_type=first_subject.perspective_type, # type: ignore
-            geonames_username=transit_geo_username,
-            online=transit_geo_online,
+        first_astrological_subject = create_astrological_subject(first_subject)
+        second_astrological_subject = create_astrological_subject(
+            second_subject,
+            name_override="Transit",
+            zodiac_type_override=first_astrological_subject.zodiac_type,
+            sidereal_mode_override=first_subject.sidereal_mode,
+            houses_system_identifier_override=first_subject.houses_system_identifier,
+            perspective_type_override=first_subject.perspective_type,
         )
 
         aspects = SynastryAspects(
