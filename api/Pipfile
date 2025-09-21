@@ -23,7 +23,7 @@ httpx = "*"
 types-requests = "*"
 
 [requires]
-python_version = "3.11"
+python_version = "3.13"
 
 [scripts]
 dev = "uvicorn app.main:app --reload --log-level debug"
