@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Astral - Gerador de Carta Natal</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌟 Gerador de Mapa Astral</h1>
+            <p>Descubra os segredos das estrelas em sua carta natal personalizada</p>
+        </header>
+
+        <main>
+            <div class="form-container">
+                <form id="astralForm">
+                    <div class="form-group">
+                        <label for="name">Nome Completo</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="date">Data de Nascimento</label>
+                            <input type="date" id="date" name="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="time">Horário de Nascimento</label>
+                            <input type="time" id="time" name="time" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="city">Cidade de Nascimento</label>
+                        <input type="text" id="city" name="city" placeholder="Ex: São Paulo, SP ou New York, NY" required>
+                        <small class="form-help">Digite o nome da cidade e estado/país (ex: "São Paulo, SP" ou "Paris, França")</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="theme">Tema do Mapa</label>
+                        <select id="theme" name="theme">
+                            <option value="light">Claro</option>
+                            <option value="dark">Escuro</option>
+                            <option value="dark-high-contrast">Escuro Alto Contraste</option>
+                            <option value="classic">Clássico</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" id="generateBtn">
+                        <span id="btnText">Gerar Mapa Astral</span>
+                        <div id="loading" class="loading hidden">
+                            <div class="spinner"></div>
+                        </div>
+                    </button>
+                </form>
+            </div>
+
+            <div id="results" class="results hidden">
+                <div class="result-header">
+                    <h2>Seu Mapa Astral</h2>
+                    <div class="result-info">
+                        <span id="resultName"></span>
+                        <span id="resultDate"></span>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div id="chartSvg"></div>
+                </div>
+                
+                <div class="data-container">
+                    <h3>Dados Astrológicos</h3>
+                    <div id="astrologicalData"></div>
+                </div>
+
+                <div class="aspects-container">
+                    <h3>Aspectos Planetários</h3>
+                    <div id="aspectsData"></div>
+                </div>
+            </div>
+
+            <div id="error" class="error hidden">
+                <p id="errorMessage"></p>
+            </div>
+        </main>
+
+        <footer>
+            <p>Gerado com a API Astrologer | Baseado na biblioteca Kerykeion</p>
+        </footer>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

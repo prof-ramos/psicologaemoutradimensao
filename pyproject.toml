@@ -1,0 +1,17 @@
+[project]
+name = "repl-nix-workspace"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.116.2",
+    "kerykeion>=4.26.3",
+    "pydantic>=2.11.9",
+    "pydantic-settings>=2.10.1",
+    "pytz>=2024.2",
+    "scour>=0.38.2",
+    "starlette>=0.48.0",
+    "types-pytz>=2025.2.0.20250809",
+    "typing-extensions>=4.15.0",
+    "uvicorn>=0.35.0",
+]
