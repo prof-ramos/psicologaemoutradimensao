@@ -2,5 +2,11 @@
   "installCommand": "cd website && npm install",
   "buildCommand": "cd website && npm run build",
   "outputDirectory": "website/build",
-  "framework": "docusaurus-2"
+  "framework": "docusaurus-2",
+  "git": {
+    "productionBranch": "deploy",
+    "deploymentEnabled": {
+      "preview": false
+    }
+  }
 }

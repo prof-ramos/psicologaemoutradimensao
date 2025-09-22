@@ -1,9 +1,9 @@
-import React from 'react';
+import React, {type ReactElement} from 'react';
 import Head from '@docusaurus/Head';
 import Loader from '@site/src/components/Loader';
 import '../css/ComingSoon.css';
 
-export default function Home(): JSX.Element {
+export default function Home(): ReactElement {
   return (
     <>
       <Head>
