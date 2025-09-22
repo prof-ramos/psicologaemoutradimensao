@@ -62,100 +62,46 @@ reviews:
     issue_assessment:
       mode: "warning"
   tools:
-    ast-grep:
-      rule_dirs: []
-      util_dirs: []
-      essential_rules: true
-      packages: []
-    shellcheck:
-      enabled: true
+    # Python tools (API)
     ruff:
       enabled: true
-    markdownlint:
-      enabled: true
-    github-checks:
-      enabled: true
-      timeout_ms: 90000
-    languagetool:
-      enabled: true
-      enabled_rules: []
-      disabled_rules: []
-      enabled_categories: []
-      disabled_categories: []
-      enabled_only: false
-      level: "default"
-    biome:
-      enabled: true
-    hadolint:
-      enabled: false
-    swiftlint:
-      enabled: false
-      config_file: ""
-    phpstan:
-      enabled: false
-      level: "default"
-    phpmd:
-      enabled: false
-    phpcs:
-      enabled: false
-    golangci-lint:
-      enabled: false
-      config_file: ""
-    yamllint:
-      enabled: true
-    gitleaks:
-      enabled: true
-    checkov:
-      enabled: false
-    detekt:
-      enabled: false
-      config_file: ""
-    eslint:
+    pylint:
       enabled: true
     flake8:
       enabled: true
-    rubocop:
-      enabled: false
-    buf:
-      enabled: false
-    regal:
-      enabled: false
-    actionlint:
-      enabled: false
-    pmd:
-      enabled: false
-      config_file: ""
-    cppcheck:
-      enabled: false
-    semgrep:
+
+    # JavaScript/TypeScript tools (Website)
+    eslint:
       enabled: true
-      config_file: ""
-    circleci:
-      enabled: false
-    clippy:
-      enabled: false
-    sqlfluff:
-      enabled: false
-    prismaLint:
-      enabled: false
-    pylint:
+    biome:
       enabled: true
     oxc:
       enabled: true
-    shopifyThemeCheck:
-      enabled: false
-    luacheck:
-      enabled: false
-    brakeman:
-      enabled: false
-    dotenvLint:
+
+    # Documentation and markup
+    markdownlint:
       enabled: true
     htmlhint:
       enabled: true
-    checkmake:
-      enabled: false
+
+    # Configuration files
+    yamllint:
+      enabled: true
+    dotenvLint:
+      enabled: true
+
+    # Security
     osvScanner:
       enabled: true
+
+    # Infrastructure (Docker, GitHub Actions)
+    hadolint:
+      enabled: true
+    actionlint:
+      enabled: true
+
+    # Disabled tools (not relevant for this project)
+    # Note: These tools are disabled by simply not including them in the active list above
 # =============================================================================
 # CHAT
 # =============================================================================

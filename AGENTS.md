@@ -1,34 +1,19 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-- `api/app/` hospeda o backend FastAPI; roteadores em `routers/`, esquemas em `schemas/`, utilidades reutilizáveis em `core/`.
-- `api/tests/` armazena suites Pytest alinhadas aos módulos.
-- `website/src/` compõe o front-end Docusaurus (React + TypeScript); conteúdo editorial mora em `website/docs/` e `website/blog/`.
-- `ROADMAP.md` e `GEMINI.md` concentram diretrizes estratégicas e devem acompanhar mudanças relevantes.
+Backend code lives in `api/app/` with FastAPI routers under `routers/`, data schemas in `schemas/`, and shared helpers in `core/`. Tests mirror this layout in `api/tests/`, using module-aligned suites and centralized fixtures in `conftest.py`. The Docusaurus front-end sits in `website/src/`, with authored content split between `website/docs/` and `website/blog/`. Keep strategic updates reflected in `ROADMAP.md` and `GEMINI.md` whenever backend or website work shifts direction.
 
 ## Build, Test, and Development Commands
-- Backend local: `cd api && uvicorn app.main:app --reload` para desenvolvimento rápido.
-- Dependências: `uv sync` ou `pip install -e .`; regenere esquemas com `python dump_schema.py` sempre que alterar modelos Pydantic.
-- Qualidade backend: `pytest -v`, `python -m mypy --ignore-missing-imports .`, `black . --line-length 200`.
-- Website: `cd website && npm install` inicial; `npm run start` para preview, `npm run build` para validação final, `npm run typecheck` para checar tipos.
+Spin up the API locally with `cd api && uvicorn app.main:app --reload` for hot-reload iterations. Sync Python dependencies via `uv sync` (or `pip install -e .` when bootstraping). Regenerate OpenAPI artifacts by running `python dump_schema.py` after touching Pydantic models. For the website, initialize with `cd website && npm install`, preview using `npm run start`, and validate production output through `npm run build`. Type safety checks live behind `npm run typecheck`.
 
 ## Coding Style & Naming Conventions
-- Python: indentação de 4 espaços, `snake_case` para funções/variáveis, `PascalCase` para classes. Formate com `black` antes de subir commits.
-- TypeScript/React: componentes e hooks em `PascalCase` e `camelCase`; páginas vivem em `src/pages/`. Use `@site/` para imports absolutos quando fizer sentido.
-- Segredos e tokens residem em variáveis de ambiente; nunca versionar `.env`.
+Adopt four-space indentation for Python, naming modules and functions in `snake_case`, while classes stay `PascalCase`. Format Python code with `black . --line-length 200` before opening a PR. TypeScript and React components follow `PascalCase`, hooks use `camelCase`, and absolute imports prefer the `@site/` alias when practical. Keep all new files ASCII unless existing context dictates otherwise.
 
 ## Testing Guidelines
-- Nomeie arquivos como `test_*.py` e cubra cenários felizes e de validação negativa.
-- Centralize fixtures em `api/tests/conftest.py` para evitar duplicação.
-- No website, rode `npm run build` antes do merge; introduza lint ou testes de links conforme o front crescer.
-- Registre no PR os testes executados e dados relevantes (por exemplo, payloads de exemplo).
+Use Pytest (`cd api && pytest -v`) to cover both happy-path and validation failures; integrate fixtures through `api/tests/conftest.py` to avoid duplication. Front-end changes must survive `npm run build`, and future linting or link-check steps should be added as the surface area grows. Name Python tests `test_*.py` and ensure sample payloads or edge cases are documented in the PR description.
 
 ## Commit & Pull Request Guidelines
-- Mensagens `tipo: resumo` (ex.: `feat: adicionar endpoint de sinastria`); mantenha commits focados.
-- Branches partem de `main` com prefixos `feat/`, `fix/`, `docs/` ou `chore/`.
-- PRs explicam problema, solução e impacto; inclua capturas ou respostas da API e associe issues (`#123`) quando existirem.
-- Atualize documentação (`README.md`, docs) sempre que expor novos endpoints, páginas ou processos.
+Structure commit messages as `tipo: resumo`, e.g., `feat: adicionar endpoint de sinastria`, keeping scope tight. Branches start from `main` with prefixes like `feat/` or `fix/`. Pull requests should explain the problem, the implemented solution, observed API responses or UI captures, and reference issues (e.g., `#123`). Update relevant docs—`README.md`, `website/docs/`, or `ROADMAP.md`—whenever endpoints, flows, or processes evolve.
 
-## Environment & Configuration Tips
-- Modele segredos a partir de `.env.example` (ou duplique `.env` para `.env.local`) e armazene chaves RapidAPI em cofres seguros.
-- Scripts de implantação (`Procfile`, `run.sh`) dependem do mesmo conjunto de dependências; ajuste-os ao evoluir argumentos de execução.
+## Security & Configuration Tips
+Never commit secrets; rely on environment variables sourced from `.env.example` or a local copy. Store RapidAPI keys and other credentials in secure vaults. Deployment scripts (`Procfile`, `run.sh`) assume parity with the declared dependencies—keep them in sync when adjusting runtime arguments or package versions.
