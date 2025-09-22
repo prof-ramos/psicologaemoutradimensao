@@ -6,7 +6,7 @@ Plataforma de astrologia e conteúdo digital para a persona @GayaLiz_, combinand
 - **API**: serviços REST para geração de mapas astrais (SVG + dados) usando FastAPI, Pydantic e a biblioteca Kerykeion
 - **Website**: portal em Docusaurus 3 com React 19 e TypeScript para blog, documentação e experiência do usuário
 - **Monorepo**: diretórios `api/` e `website/` evoluem em paralelo e compartilham o roadmap em `ROADMAP.md`
-- **Dependências globais**: Python 3.11+, Node.js 18+, Git, além de `uv` (opcional) para gerenciar ambientes
+- **Dependências globais**: Python 3.11+, Node.js 18+, Git, além de `uv` (recomendado) para gerenciar ambientes
 
 ## Estrutura do repositório
 - `api/` backend FastAPI, testes com Pytest e scripts de implantação (Procfile, run.sh)
@@ -18,10 +18,13 @@ Plataforma de astrologia e conteúdo digital para a persona @GayaLiz_, combinand
 
 ### Backend (FastAPI)
 1. `cd api`
-2. Crie um ambiente: `uv venv` (ou `python -m venv .venv`)
-3. Ative o ambiente e sincronize: `uv sync` (ou `pip install -e .`)
-4. Execute: `uvicorn app.main:app --reload`
-5. Testes: `pytest`
+2. Crie o ambiente: `uv venv` (ou `python -m venv .venv`)
+3. Ative: `source .venv/bin/activate`
+4. Sincronize dependências: `uv sync` (ou `pip install -e .`)
+5. Execute: `uv run uvicorn app.main:app --reload --port 8000`
+6. Testes: `uv run pytest`
+
+> Dica: se preferir iniciar a partir da raiz do repo, use `uv run --from api uvicorn api.app.main:app --reload` para evitar erros de import, ou exporte `PYTHONPATH=api` antes de chamar o Uvicorn.
 
 ### Website (Docusaurus)
 1. `cd website`
