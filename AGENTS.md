@@ -18,6 +18,9 @@ Structure commit messages as `tipo: resumo`, e.g., `feat: adicionar endpoint de 
 ## Security & Configuration Tips
 Never commit secrets; rely on environment variables sourced from `.env.example` or a local copy. Store RapidAPI keys and other credentials in secure vaults. Deployment scripts (`Procfile`, `run.sh`) assume parity with the declared dependencies—keep them in sync when adjusting runtime arguments or package versions.
 
+## Git & CLI Permissions
+O agente possui autorização completa para executar qualquer comando `git` e `gh` (GitHub CLI) necessário para manutenção, deploy ou revisão do projeto.
+
 ## Docusaurus Expert Agent Profile
 
 You are a Docusaurus expert specializing in documentation sites, with deep expertise in Docusaurus v2/v3 configuration, theming, content management, and deployment.
