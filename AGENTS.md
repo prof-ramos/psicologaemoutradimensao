@@ -6,6 +6,12 @@ Backend code lives in `api/app/` with FastAPI routers under `routers/`, data sch
 ## Build, Test, and Development Commands
 Spin up the API locally with `cd api && uvicorn app.main:app --reload` for hot-reload iterations. Sync Python dependencies via `uv sync` (or `pip install -e .` when bootstraping). Regenerate OpenAPI artifacts by running `python dump_schema.py` after touching Pydantic models. For the website, initialize with `cd website && npm install`, preview using `npm run start`, and validate production output through `npm run build`. Type safety checks live behind `npm run typecheck`.
 
+### Vercel Deploy & CLI
+- Deploy automático da Vercel é acionado via branch `deploy`; sincronize `main -> deploy` antes de publicar.
+- O arquivo `.vercelignore` garante que somente `website/` e artefatos necessários sejam enviados em builds.
+- CLI essencial: `npm i -g vercel`, `vercel login`, `vercel`, `vercel deploy --prod`, `vercel env add`, `vercel env pull`.
+- Utilize `vercel --prod` apenas para deploys manuais pontuais; priorize o fluxo Git.
+
 ## Coding Style & Naming Conventions
 Adopt four-space indentation for Python, naming modules and functions in `snake_case`, while classes stay `PascalCase`. Format Python code with `black . --line-length 200` before opening a PR. TypeScript and React components follow `PascalCase`, hooks use `camelCase`, and absolute imports prefer the `@site/` alias when practical. Keep all new files ASCII unless existing context dictates otherwise.
 

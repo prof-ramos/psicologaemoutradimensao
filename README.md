@@ -33,6 +33,18 @@ Plataforma de astrologia e conteúdo digital para a persona @GayaLiz_, combinand
 4. Build estático: `npm run build`
 5. Type-check opcional: `npm run typecheck`
 
+### Deploy na Vercel
+- Branch principal: `main`; deploy automático ocorre ao atualizar `deploy` (configurado em `vercel.json`).
+- `.vercelignore` mantém apenas o conteúdo de `website/` no upload, seguindo boas práticas de monorepo.
+- Comandos úteis da CLI (instale com `npm i -g vercel`):
+  ```bash
+  vercel login             # autentica
+  vercel                   # deploy interativo (preview)
+  vercel deploy --prod     # deploy manual em produção
+  vercel env add|pull      # gerencia variáveis de ambiente
+  ```
+- Prefira o fluxo Git (`merge main -> deploy` + `git push`) e use `vercel --prod` apenas em casos pontuais.
+
 ## Fluxo de desenvolvimento
 - Trabalhe com feature branches partindo de `main`
 - Commits pequenos, mensagens no formato `tipo: contexto curto` (ex.: `feat: adicionar endpoint de sinastria`)
