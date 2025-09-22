@@ -89,6 +89,7 @@ Para novos conteúdos, inclua frontmatter consistente (`title`, `sidebar_positio
 - Apenas a branch `deploy` dispara deploy automático na Vercel (configurado em `vercel.json`).
 - Faça merge das mudanças relevantes em `deploy` e `git push` para acionar o deploy.
 - Monitore o painel da Vercel para logs e status.
+- O arquivo `.vercelignore` garante que apenas o diretório `website/` (e dependências necessárias) sejam enviados para a build, seguindo a recomendação da Vercel para monorepos.
 
 ### Fluxo Git Padrão
 
@@ -96,6 +97,28 @@ Para novos conteúdos, inclua frontmatter consistente (`title`, `sidebar_positio
 2. Abra PR direcionando para `main` (se necessário).
 3. Após revisão, garanta que `main` e `deploy` estejam sincronizadas (`git merge` e `git push`).
 4. A Vercel fará deploy automaticamente assim que `deploy` for atualizada.
+
+### Vercel CLI Essencial
+
+Instalação global (conforme [Vercel CLI README](https://github.com/vercel/vercel/blob/main/packages/cli/README.md)):
+
+```bash
+npm i -g vercel
+```
+
+Comandos úteis:
+
+```bash
+vercel login             # autentica a CLI
+vercel init              # inicializa projeto/link com Vercel
+vercel                   # deploy interativo (preview por padrão)
+vercel deploy --prod     # deploy direto em produção
+vercel env add           # adiciona variáveis de ambiente
+vercel env pull          # sincroniza variáveis localmente
+vercel rm <project>      # remove deploys antigos
+```
+
+> Dica: use `vercel --prod` apenas quando precisar forçar o deploy manual na produção. O fluxo preferencial continua sendo pelo push na branch `deploy`.
 
 ## Boas Práticas
 
@@ -105,9 +128,11 @@ Para novos conteúdos, inclua frontmatter consistente (`title`, `sidebar_positio
 4. Documentar alterações significativas neste diretório `docs/`.
 5. Utilizar `gh pr create` para abrir PRs e registrar contexto.
 6. Rodar `npm audit` periodicamente e registrar ações de correção.
+7. Utilize `vercel env add` para variáveis sensíveis e evite comitar segredos.
 
 ## Referências Úteis
 
 - [Documentação oficial Docusaurus](https://docusaurus.io/docs)
 - [Guia de Deploy na Vercel](https://docusaurus.io/docs/deployment#vercel)
 - Diretório `.clinerules/` para orientações específicas de agentes
+- [Vercel CLI README](https://github.com/vercel/vercel/blob/main/packages/cli/README.md)

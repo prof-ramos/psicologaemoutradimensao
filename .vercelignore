@@ -1,0 +1,10 @@
+# Exclude non-site artifacts from Vercel deployments
+api/
+docs/
+.clinerules/
+AGENTS.md
+GEMINI.md
+ROADMAP.md
+pyproject.toml
+uv.lock
+README.md
