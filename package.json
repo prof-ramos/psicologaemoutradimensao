@@ -9,6 +9,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@astrodraw/astrochart": "^3.0.2",
     "@radix-ui/react-slot": "^1.2.4",
     "@wisp-cms/client": "^0.0.23",
     "circular-natal-horoscope-js": "^1.1.0",
