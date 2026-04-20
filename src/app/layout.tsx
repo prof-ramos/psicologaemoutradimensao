@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-BR" className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <body className="flex min-h-screen flex-col bg-background">
         <Navbar name={config.blog.name} />
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+        <main className="flex-1 w-full">
           {children}
         </main>
         <Footer />

@@ -20,7 +20,7 @@ export default async function HomePage() {
   const { posts } = await wisp.getPosts({ limit: 6 })
 
   return (
-    <div className="-mx-4 -mt-8">
+    <div>
 
       {/* ── Ticker ── */}
       <div className="overflow-hidden border-b-2 border-border bg-foreground py-2.5">

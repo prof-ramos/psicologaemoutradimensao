@@ -46,7 +46,7 @@ export default async function PostPage({ params }: PostPageProps) {
   const { post } = result
 
   return (
-    <article className="mx-auto max-w-3xl space-y-8">
+    <article className="mx-auto max-w-3xl px-4 py-8 space-y-8">
       <header className="space-y-4">
         {post.tags.length > 0 && (
           <div className="flex flex-wrap gap-2">

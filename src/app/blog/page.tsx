@@ -22,7 +22,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const { posts, pagination } = await wisp.getPosts({ limit, page })
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-6xl px-4 py-8 space-y-8">
       <h1 className="font-heading text-4xl font-black">Blog</h1>
 
       {posts.length > 0 ? (

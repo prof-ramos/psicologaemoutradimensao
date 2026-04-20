@@ -46,7 +46,7 @@ export default async function MapaAstralPage({ searchParams }: PageProps) {
   }
 
   return (
-    <div className="-mx-4 -mt-8">
+    <div>
 
       {/* ── Hero ── */}
       <div className="border-b-2 border-border bg-cosmic-blue px-4 py-10 md:py-14">
