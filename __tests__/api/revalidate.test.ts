@@ -7,7 +7,7 @@ describe('revalidation auth logic', () => {
 
   it('rejeita com secret incorreto', () => {
     const secret = 'my-secret'
-    const provided = 'wrong'
+    const provided = 'wrong' as string
     expect(provided === secret).toBe(false)
   })
 

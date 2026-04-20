@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { TwitterIcon } from 'lucide-react'
+import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export const metadata: Metadata = {
@@ -22,7 +22,7 @@ export default function ContatoPage() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <TwitterIcon className="h-5 w-5" />
+          <X className="h-5 w-5" />
           @Gayaliz_
         </a>
       </Button>
