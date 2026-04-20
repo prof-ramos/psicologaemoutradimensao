@@ -5,14 +5,14 @@ import { Footer } from '@/components/footer'
 import { config } from '@/config'
 import './globals.css'
 
-const inter = Space_Grotesk({
-  subsets: ['latin'],
-  variable: '--font-heading',
-})
-
-const spaceGrotesk = Inter({
+const inter = Inter({
   subsets: ['latin'],
   variable: '--font-base',
+})
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-heading',
 })
 
 export const metadata: Metadata = {
