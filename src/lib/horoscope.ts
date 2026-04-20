@@ -18,6 +18,12 @@ export type AspectInfo = {
   orb: number      // ex: 2.3
 }
 
+export type AnglePosition = {
+  signPt: string        // "Áries", "Touro", …
+  degree: number        // 0–359.99 graus eclípticos
+  degreeInSign: number  // 0–29.99 graus dentro do signo
+}
+
 export type HoroscopeResult = {
   /** Formato AstroChart: { Sun: [281], Moon: [268, -0.2], … } */
   planets: Record<string, number[]>
@@ -26,6 +32,10 @@ export type HoroscopeResult = {
   positions: PlanetPosition[]
   aspects: AspectInfo[]
   hasHouses: boolean
+  /** Ascendente — só presente quando hasHouses=true */
+  ascendant?: AnglePosition
+  /** Meio do Céu (MC) — só presente quando hasHouses=true */
+  midheaven?: AnglePosition
 }
 
 export type HoroscopeInput = {
@@ -104,5 +114,32 @@ export function calculateHoroscope(input: HoroscopeInput): HoroscopeResult {
     orb:     Math.round(asp.orb * 10) / 10,
   }))
 
-  return { planets, cusps, positions, aspects, hasHouses: input.hasTime }
+  // ── Ascendente e MC ───────────────────────────────────────────────────
+  let ascendant: HoroscopeResult['ascendant']
+  let midheaven: HoroscopeResult['midheaven']
+
+  if (input.hasTime) {
+    const asc = horoscope.Ascendant as any
+    const mc  = horoscope.Midheaven as any
+
+    if (asc) {
+      const deg = asc.ChartPosition.Ecliptic.DecimalDegrees as number
+      ascendant = {
+        signPt:       SIGN_PT[asc.Sign.label] ?? asc.Sign.label,
+        degree:       deg,
+        degreeInSign: deg % 30,
+      }
+    }
+
+    if (mc) {
+      const deg = mc.ChartPosition.Ecliptic.DecimalDegrees as number
+      midheaven = {
+        signPt:       SIGN_PT[mc.Sign.label] ?? mc.Sign.label,
+        degree:       deg,
+        degreeInSign: deg % 30,
+      }
+    }
+  }
+
+  return { planets, cusps, positions, aspects, hasHouses: input.hasTime, ascendant, midheaven }
 }

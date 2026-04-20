@@ -31,6 +31,28 @@ export function ChartDetails({ data, cidade, dataStr, hora }: ChartDetailsProps)
         )}
       </div>
 
+      {/* Ângulos — Ascendente e MC */}
+      {data.hasHouses && (data.ascendant || data.midheaven) && (
+        <div className="flex flex-wrap gap-3">
+          {data.ascendant && (
+            <div className="border-2 border-border bg-cosmic-blue px-4 py-2 shadow-shadow">
+              <p className="font-heading text-xs font-black uppercase">Ascendente</p>
+              <p className="font-base text-sm font-bold">
+                {data.ascendant.signPt} {Math.floor(data.ascendant.degreeInSign)}°
+              </p>
+            </div>
+          )}
+          {data.midheaven && (
+            <div className="border-2 border-border bg-vibrant-pink px-4 py-2 shadow-shadow">
+              <p className="font-heading text-xs font-black uppercase">Meio do Céu</p>
+              <p className="font-base text-sm font-bold">
+                {data.midheaven.signPt} {Math.floor(data.midheaven.degreeInSign)}°
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Tabela de posições */}
       <div className="space-y-2">
         <h2 className="font-heading text-lg font-black uppercase">Posições Planetárias</h2>

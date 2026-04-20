@@ -65,4 +65,30 @@ describe('calculateHoroscope', () => {
       expect(typeof asp.orb).toBe('number')
     }
   })
+
+  it('retorna ascendente em signo pt-BR quando hasTime=true', () => {
+    const result = calculateHoroscope(BASE_INPUT)
+    expect(result.ascendant).toBeDefined()
+    const validSigns = ['Áries','Touro','Gêmeos','Câncer','Leão','Virgem',
+                        'Libra','Escorpião','Sagitário','Capricórnio','Aquário','Peixes']
+    expect(validSigns).toContain(result.ascendant!.signPt)
+    expect(result.ascendant!.degree).toBeGreaterThanOrEqual(0)
+    expect(result.ascendant!.degree).toBeLessThan(360)
+  })
+
+  it('retorna MC em signo pt-BR quando hasTime=true', () => {
+    const result = calculateHoroscope(BASE_INPUT)
+    expect(result.midheaven).toBeDefined()
+    const validSigns = ['Áries','Touro','Gêmeos','Câncer','Leão','Virgem',
+                        'Libra','Escorpião','Sagitário','Capricórnio','Aquário','Peixes']
+    expect(validSigns).toContain(result.midheaven!.signPt)
+    expect(result.midheaven!.degree).toBeGreaterThanOrEqual(0)
+    expect(result.midheaven!.degree).toBeLessThan(360)
+  })
+
+  it('ascendente e MC são undefined quando hasTime=false', () => {
+    const result = calculateHoroscope({ ...BASE_INPUT, hasTime: false })
+    expect(result.ascendant).toBeUndefined()
+    expect(result.midheaven).toBeUndefined()
+  })
 })
