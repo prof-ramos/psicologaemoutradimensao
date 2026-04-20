@@ -13,6 +13,7 @@ export function BlogPostContent({ content, className }: BlogPostContentProps) {
     ]),
     allowedAttributes: {
       ...sanitizeHtml.defaults.allowedAttributes,
+      a: [...(sanitizeHtml.defaults.allowedAttributes.a ?? []), 'rel'],
       img: ['src', 'alt', 'width', 'height', 'class'],
       '*': ['class'],
     },

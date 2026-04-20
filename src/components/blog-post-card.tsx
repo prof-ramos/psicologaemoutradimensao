@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { Badge } from '@/components/ui/badge'
@@ -33,11 +34,12 @@ export function BlogPostCard({ post }: { post: Post }) {
       )}
     >
       {post.image && (
-        <div className="overflow-hidden border-2 border-border">
-          <img
+        <div className="relative h-48 overflow-hidden border-2 border-border">
+          <Image
             src={post.image}
             alt={post.title}
-            className="h-48 w-full object-cover"
+            fill
+            className="object-cover"
           />
         </div>
       )}
