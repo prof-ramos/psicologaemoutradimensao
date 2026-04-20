@@ -9,6 +9,6 @@ describe('Badge', () => {
 
   it('aplica variant blue', () => {
     render(<Badge variant="blue">cosmos</Badge>)
-    expect(screen.getByText('cosmos')).toHaveClass('bg-cosmic-blue')
+    expect(screen.getByText('cosmos').closest('div')).toHaveClass('bg-cosmic-blue')
   })
 })

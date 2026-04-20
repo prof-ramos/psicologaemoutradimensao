@@ -2,6 +2,9 @@ import crypto from 'crypto'
 import { config } from '@/config'
 
 export function signOgImageUrl({ title }: { title: string }): string {
+  if (!config.ogImageSecret) {
+    throw new Error('OG image secret not configured')
+  }
   const params = new URLSearchParams({ title })
   const signature = crypto
     .createHmac('sha256', config.ogImageSecret)
