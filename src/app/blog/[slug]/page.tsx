@@ -1,12 +1,12 @@
-import { notFound } from 'next/navigation'
-import type { Metadata } from 'next'
+import { BlogPostContent } from '@/components/blog-post-content'
+import type { BadgeProps } from '@/components/ui/badge'
+import { Badge } from '@/components/ui/badge'
+import { wisp } from '@/lib/wisp'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { wisp } from '@/lib/wisp'
-import { BlogPostContent } from '@/components/blog-post-content'
-import { Badge } from '@/components/ui/badge'
-import type { BadgeProps } from '@/components/ui/badge'
+import type { Metadata } from 'next'
 import Image from 'next/image'
+import { notFound } from 'next/navigation'
 
 export const revalidate = 3600
 
@@ -41,7 +41,7 @@ export default async function PostPage({ params }: PostPageProps) {
   const { slug } = await params
   const result = await wisp.getPost(slug)
 
-  if (!result?.post) notFound()
+  if (!result?.post) return notFound()
 
   const { post } = result
 

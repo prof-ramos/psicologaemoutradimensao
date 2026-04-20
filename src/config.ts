@@ -1,6 +1,36 @@
-const buildConfig = () => {
+export interface AppConfig {
+  baseUrl: string
+  blog: {
+    name: string
+    metadata: {
+      title: {
+        absolute: string
+        default: string
+        template: string
+      }
+      description: string
+    }
+  }
+  ogImageSecret: string
+  revalidationSecret: string
+  wisp: { blogId: string }
+}
+
+const buildConfig = (): AppConfig => {
   const blogId = process.env.NEXT_PUBLIC_BLOG_ID
   if (!blogId) throw new Error('NEXT_PUBLIC_BLOG_ID is missing')
+
+  const isProduction = process.env.NODE_ENV === 'production'
+
+  const ogImageSecret = process.env.OG_IMAGE_SECRET
+  if (isProduction && !ogImageSecret) {
+    throw new Error('OG_IMAGE_SECRET is missing in production')
+  }
+
+  const revalidationSecret = process.env.REVALIDATION_SECRET
+  if (isProduction && !revalidationSecret) {
+    throw new Error('REVALIDATION_SECRET is missing in production')
+  }
 
   const name = process.env.NEXT_PUBLIC_BLOG_DISPLAY_NAME || 'PsicologaEmOutraDimensão'
   const defaultDescription = process.env.NEXT_PUBLIC_BLOG_DESCRIPTION || 'Blog pessoal'
@@ -18,10 +48,10 @@ const buildConfig = () => {
         description: defaultDescription,
       },
     },
-    ogImageSecret: process.env.OG_IMAGE_SECRET || 'dev-secret',
-    revalidationSecret: process.env.REVALIDATION_SECRET || '',
+    ogImageSecret: ogImageSecret || 'dev-secret',
+    revalidationSecret: revalidationSecret || '',
     wisp: { blogId },
   }
 }
 
-export const config = buildConfig()
+export const config: AppConfig = buildConfig()

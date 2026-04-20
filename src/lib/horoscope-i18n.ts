@@ -46,10 +46,14 @@ export const ASPECT_PT: Record<string, string> = {
  * Converte body.key (lowercase) para chave do AstroChart.
  * Regra geral: capitaliza primeira letra. Exceções: northnode → NNode.
  */
+const ASTRO_CHART_EXCEPTIONS: Record<string, string> = {
+  northnode: 'NNode',
+  southnode: 'SNode',
+}
+
 export function toAstroChartKey(key: string): string {
-  const exceptions: Record<string, string> = {
-    northnode: 'NNode',
-    southnode: 'SNode',
+  if (typeof key !== 'string' || !key.trim()) {
+    throw new TypeError(`toAstroChartKey: invalid key "${key}"`)
   }
-  return exceptions[key] ?? (key.charAt(0).toUpperCase() + key.slice(1))
+  return ASTRO_CHART_EXCEPTIONS[key] ?? (key.charAt(0).toUpperCase() + key.slice(1))
 }

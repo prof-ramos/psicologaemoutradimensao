@@ -1,5 +1,5 @@
-import sanitizeHtml from 'sanitize-html'
 import { cn } from '@/lib/utils'
+import sanitizeHtml from 'sanitize-html'
 
 interface BlogPostContentProps {
   content: string
@@ -14,7 +14,7 @@ export function BlogPostContent({ content, className }: BlogPostContentProps) {
     allowedAttributes: {
       ...sanitizeHtml.defaults.allowedAttributes,
       a: [...(sanitizeHtml.defaults.allowedAttributes.a ?? []), 'rel'],
-      img: ['src', 'alt', 'width', 'height', 'class'],
+      img: ['src', 'alt', 'width', 'height', 'class', 'srcset', 'sizes', 'loading'],
       '*': ['class'],
     },
   })

@@ -29,4 +29,12 @@ describe('config', () => {
     const { config } = require('../src/config')
     expect(config.blog.name).toBe('Meu Blog')
   })
+
+  it('uses default blog name when env var absent', () => {
+    delete process.env.NEXT_PUBLIC_BLOG_DISPLAY_NAME
+    process.env.NEXT_PUBLIC_BLOG_ID = 'abc'
+    jest.resetModules()
+    const { config } = require('../src/config')
+    expect(config.blog.name).toBe('PsicologaEmOutraDimensão')
+  })
 })

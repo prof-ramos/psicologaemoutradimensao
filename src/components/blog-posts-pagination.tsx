@@ -1,9 +1,9 @@
 'use client'
 
+import { Button } from '@/components/ui/button'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 
 interface Pagination {
   page: number
@@ -13,7 +13,7 @@ interface Pagination {
 
 export function BlogPostsPagination({ pagination }: { pagination: Pagination }) {
   const { page, totalPosts, limit } = pagination
-  const totalPages = Math.ceil(totalPosts / limit)
+  const totalPages = limit > 0 ? Math.ceil(totalPosts / limit) : 0
   const hasPrev = page > 1
   const hasNext = page < totalPages
   const searchParams = useSearchParams()
@@ -27,7 +27,7 @@ export function BlogPostsPagination({ pagination }: { pagination: Pagination }) 
   if (totalPages <= 1) return null
 
   return (
-    <nav className="flex items-center justify-between pt-8">
+    <nav aria-label="Blog posts pagination" className="flex items-center justify-between pt-8">
       {hasPrev ? (
         <Button asChild variant="outline">
           <Link href={buildHref(page - 1)}>

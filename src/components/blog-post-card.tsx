@@ -1,10 +1,10 @@
-import Link from 'next/link'
-import Image from 'next/image'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+import type { BadgeProps } from '@/components/ui/badge'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import type { BadgeProps } from '@/components/ui/badge'
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
+import Image from 'next/image'
+import Link from 'next/link'
 
 const TAG_VARIANTS: Array<BadgeProps['variant']> = ['blue', 'pink', 'orange', 'default']
 
@@ -27,6 +27,7 @@ export function BlogPostCard({ post }: { post: Post }) {
   return (
     <Link
       href={`/blog/${post.slug}`}
+      tabIndex={0}
       className={cn(
         'group flex flex-col gap-3 rounded-base border-2 border-border bg-background p-5',
         'shadow-shadow transition-all duration-200',
@@ -34,7 +35,7 @@ export function BlogPostCard({ post }: { post: Post }) {
       )}
     >
       {post.image && (
-        <div className="relative h-48 overflow-hidden border-2 border-border">
+        <div className="relative h-48 overflow-hidden border-2 border-border rounded-base">
           <Image
             src={post.image}
             alt={post.title}
@@ -62,7 +63,10 @@ export function BlogPostCard({ post }: { post: Post }) {
         </p>
       )}
       {post.publishedAt && (
-        <time className="font-base text-xs text-muted-foreground">
+        <time
+          dateTime={new Date(post.publishedAt).toISOString()}
+          className="font-base text-xs text-muted-foreground"
+        >
           {format(new Date(post.publishedAt), "d 'de' MMMM 'de' yyyy", { locale: ptBR })}
         </time>
       )}

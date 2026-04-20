@@ -144,6 +144,7 @@ export function calculateHoroscope(input: HoroscopeInput): HoroscopeResult {
 
   return { planets, cusps, positions, aspects, hasHouses: input.hasTime, ascendant, midheaven }
   } catch (err) {
+    console.error('calculateHoroscope error:', err)
     throw new Error(
       `Falha no cálculo do mapa astral: ${err instanceof Error ? err.message : 'erro desconhecido'}`
     )

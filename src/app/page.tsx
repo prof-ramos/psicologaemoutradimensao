@@ -1,8 +1,8 @@
-import Link from 'next/link'
-import { ArrowRight, Sparkles, Star } from 'lucide-react'
-import { wisp } from '@/lib/wisp'
 import { BlogPostCard } from '@/components/blog-post-card'
 import { Button } from '@/components/ui/button'
+import { wisp } from '@/lib/wisp'
+import { ArrowRight, Sparkles, Star } from 'lucide-react'
+import Link from 'next/link'
 
 export const revalidate = 3600
 
@@ -17,10 +17,16 @@ const TICKER_ITEMS = [
 ]
 
 export default async function HomePage() {
-  const { posts } = await wisp.getPosts({ limit: 6 })
+  let posts: Awaited<ReturnType<typeof wisp.getPosts>>['posts'] = []
+  try {
+    const result = await wisp.getPosts({ limit: 6 })
+    posts = result.posts
+  } catch (err) {
+    console.error('wisp.getPosts error on HomePage:', err)
+  }
 
   return (
-    <div>
+    <main>
 
       {/* ── Ticker ── */}
       <div className="overflow-hidden border-b-2 border-border bg-foreground py-2.5">
@@ -45,7 +51,7 @@ export default async function HomePage() {
             <div className="lg:col-span-7 flex flex-col gap-5">
               <div>
                 <span className="inline-flex items-center gap-2 border-2 border-border bg-foreground px-3 py-1">
-                  <Star className="h-3 w-3 fill-main text-main" />
+                  <Star className="h-3 w-3 fill-main text-main" aria-hidden="true" />
                   <span className="font-heading text-xs font-black tracking-widest text-background uppercase">
                     Coluna pessoal
                   </span>
@@ -68,14 +74,14 @@ export default async function HomePage() {
               <div className="flex flex-wrap items-center gap-3 pt-1">
                 <Button asChild size="lg">
                   <Link href="/blog">
-                    <Sparkles className="h-4 w-4" />
+                    <Sparkles className="h-4 w-4" aria-hidden="true" />
                     Ler os posts
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg">
                   <Link href="/contato">
                     @Gayaliz_
-                    <ArrowRight className="h-4 w-4" />
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </Link>
                 </Button>
               </div>
@@ -129,15 +135,15 @@ export default async function HomePage() {
       </div>
 
       {/* ── Posts recentes ── */}
-      <div className="px-4 py-12">
+      <section aria-labelledby="recent-posts-heading" className="px-4 py-12">
         <div className="mx-auto max-w-6xl space-y-8">
 
           <div className="flex items-baseline justify-between">
-            <h2 className="font-heading text-3xl font-black uppercase">Posts recentes</h2>
+            <h2 id="recent-posts-heading" className="font-heading text-3xl font-black uppercase">Posts recentes</h2>
             <Button asChild variant="ghost" size="sm">
               <Link href="/blog">
                 Ver todos
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </Button>
           </div>
@@ -153,8 +159,8 @@ export default async function HomePage() {
           )}
 
         </div>
-      </div>
+      </section>
 
-    </div>
+    </main>
   )
 }

@@ -1,7 +1,10 @@
-# Blog Design Spec — PsicologaEmOutraDimensão
+---
+title: Blog Design Spec — PsicologaEmOutraDimensão
+date: 2026-04-20
+status: active-reference
+---
 
-**Data:** 2026-04-20
-**Status:** Referência ativa
+# Blog Design Spec — PsicologaEmOutraDimensão
 
 ---
 

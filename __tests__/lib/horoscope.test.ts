@@ -1,5 +1,8 @@
 import { calculateHoroscope } from '../../src/lib/horoscope'
 
+const VALID_SIGNS_PT = ['Áries','Touro','Gêmeos','Câncer','Leão','Virgem',
+                        'Libra','Escorpião','Sagitário','Capricórnio','Aquário','Peixes']
+
 const BASE_INPUT = {
   year: 1990, month: 3, day: 15,    // 15 de março de 1990
   hour: 14,   minute: 30,
@@ -42,17 +45,16 @@ describe('calculateHoroscope', () => {
 
   it('posições têm signo em pt-BR', () => {
     const result = calculateHoroscope(BASE_INPUT)
-    const validSigns = ['Áries','Touro','Gêmeos','Câncer','Leão','Virgem',
-                        'Libra','Escorpião','Sagitário','Capricórnio','Aquário','Peixes']
     for (const pos of result.positions) {
-      expect(validSigns).toContain(pos.signPt)
+      expect(VALID_SIGNS_PT).toContain(pos.signPt)
     }
   })
 
   it('planetas têm nome em pt-BR', () => {
     const result = calculateHoroscope(BASE_INPUT)
-    expect(result.positions.map(p => p.namePt)).toContain('Sol')
-    expect(result.positions.map(p => p.namePt)).toContain('Lua')
+    const names = result.positions.map(p => p.namePt)
+    expect(names).toContain('Sol')
+    expect(names).toContain('Lua')
   })
 
   it('retorna aspectos com estrutura correta', () => {
@@ -69,9 +71,7 @@ describe('calculateHoroscope', () => {
   it('retorna ascendente em signo pt-BR quando hasTime=true', () => {
     const result = calculateHoroscope(BASE_INPUT)
     expect(result.ascendant).toBeDefined()
-    const validSigns = ['Áries','Touro','Gêmeos','Câncer','Leão','Virgem',
-                        'Libra','Escorpião','Sagitário','Capricórnio','Aquário','Peixes']
-    expect(validSigns).toContain(result.ascendant!.signPt)
+    expect(VALID_SIGNS_PT).toContain(result.ascendant!.signPt)
     expect(result.ascendant!.degree).toBeGreaterThanOrEqual(0)
     expect(result.ascendant!.degree).toBeLessThan(360)
   })
@@ -79,9 +79,7 @@ describe('calculateHoroscope', () => {
   it('retorna MC em signo pt-BR quando hasTime=true', () => {
     const result = calculateHoroscope(BASE_INPUT)
     expect(result.midheaven).toBeDefined()
-    const validSigns = ['Áries','Touro','Gêmeos','Câncer','Leão','Virgem',
-                        'Libra','Escorpião','Sagitário','Capricórnio','Aquário','Peixes']
-    expect(validSigns).toContain(result.midheaven!.signPt)
+    expect(VALID_SIGNS_PT).toContain(result.midheaven!.signPt)
     expect(result.midheaven!.degree).toBeGreaterThanOrEqual(0)
     expect(result.midheaven!.degree).toBeLessThan(360)
   })

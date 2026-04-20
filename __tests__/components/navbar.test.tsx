@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react'
 import { Navbar } from '@/components/navbar'
+import { render, screen } from '@testing-library/react'
 
 describe('Navbar', () => {
   it('renderiza o nome do blog', () => {
@@ -7,18 +7,32 @@ describe('Navbar', () => {
     expect(screen.getByText('PsicologaEmOutraDimensão')).toBeInTheDocument()
   })
 
-  it('tem link para /blog', () => {
+  test.each([
+    [/blog/i, '/blog'],
+    [/contato/i, '/contato'],
+    [/mapa astral/i, '/mapa-astral'],
+  ])('tem link para %s', (name, href) => {
     render(<Navbar name="Test" />)
-    expect(screen.getByRole('link', { name: /blog/i })).toHaveAttribute('href', '/blog')
+    expect(screen.getByRole('link', { name })).toHaveAttribute('href', href)
+  })
+})
+
+describe('Navbar — edge cases', () => {
+  it('renderiza nome vazio sem quebrar', () => {
+    render(<Navbar name="" />)
+    expect(screen.getByRole('banner')).toBeInTheDocument()
   })
 
-  it('tem link para /contato', () => {
-    render(<Navbar name="Test" />)
-    expect(screen.getByRole('link', { name: /contato/i })).toHaveAttribute('href', '/contato')
+  it('renderiza nome longo e faz truncate', () => {
+    const longName = 'A'.repeat(200)
+    render(<Navbar name={longName} />)
+    expect(screen.getByText(longName)).toBeInTheDocument()
   })
+})
 
-  it('tem link para /mapa-astral', () => {
+describe('Navbar Acessibilidade', () => {
+  it('nav tem aria-label', () => {
     render(<Navbar name="Test" />)
-    expect(screen.getByRole('link', { name: /mapa astral/i })).toHaveAttribute('href', '/mapa-astral')
+    expect(screen.getByRole('navigation')).toHaveAttribute('aria-label')
   })
 })

@@ -16,10 +16,20 @@ interface BlogPageProps {
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
   const { page: pageParam } = await searchParams
-  const page = Math.max(1, parseInt(pageParam ?? '1', 10))
+  const parsed = parseInt(pageParam ?? '1', 10)
+  const page = Number.isInteger(parsed) && parsed >= 1 ? parsed : 1
   const limit = 6
 
-  const { posts, pagination } = await wisp.getPosts({ limit, page })
+  let posts: Awaited<ReturnType<typeof wisp.getPosts>>['posts'] = []
+  let pagination: Awaited<ReturnType<typeof wisp.getPosts>>['pagination'] = { page: 1, totalPosts: 0, limit: 6 }
+
+  try {
+    const result = await wisp.getPosts({ limit, page })
+    posts = result.posts
+    pagination = result.pagination
+  } catch (err) {
+    console.error('wisp.getPosts error:', err)
+  }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 space-y-8">
@@ -36,7 +46,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
             pagination={{
               page: pagination.page,
               totalPosts: pagination.totalPosts,
-              limit: typeof pagination.limit === 'number' ? pagination.limit : limit,
+              limit: pagination.limit ?? limit,
             }}
           />
         </>

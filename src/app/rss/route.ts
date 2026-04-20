@@ -1,9 +1,21 @@
-import RSS from 'rss'
-import { wisp } from '@/lib/wisp'
 import { config } from '@/config'
+import { wisp } from '@/lib/wisp'
+import RSS from 'rss'
+
+export const revalidate = 3600
 
 export async function GET() {
-  const { posts } = await wisp.getPosts({ limit: 20 })
+  let posts
+  try {
+    const result = await wisp.getPosts({ limit: 20 })
+    posts = result.posts
+  } catch (err) {
+    console.error('wisp.getPosts error:', err)
+    return new Response(JSON.stringify({ error: 'Failed to fetch posts' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
 
   const feed = new RSS({
     title: config.blog.name,
@@ -14,15 +26,20 @@ export async function GET() {
   })
 
   for (const post of posts) {
+    if (!post.publishedAt) continue
     feed.item({
       title: post.title,
       description: post.description ?? '',
       url: `${config.baseUrl}/blog/${post.slug}`,
-      date: post.publishedAt ? new Date(post.publishedAt) : new Date(),
+      date: new Date(post.publishedAt),
     })
   }
 
-  return new Response(feed.xml({ indent: true }), {
-    headers: { 'Content-Type': 'application/xml; charset=utf-8' },
+  const xml = feed.xml({ indent: true })
+  return new Response(xml, {
+    headers: {
+      'Content-Type': 'application/xml; charset=utf-8',
+      'Cache-Control': 'public, max-age=300, s-maxage=3600, stale-while-revalidate=60',
+    },
   })
 }
