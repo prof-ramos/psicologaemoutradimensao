@@ -12,23 +12,26 @@ const mockPost = {
 }
 
 describe('BlogPostCard', () => {
-  it('renderiza título do post', () => {
+  beforeEach(() => {
     render(<BlogPostCard post={mockPost} />)
+  })
+
+  it('renderiza título do post', () => {
     expect(screen.getByText('Meu Primeiro Post')).toBeInTheDocument()
   })
 
   it('renderiza descrição', () => {
-    render(<BlogPostCard post={mockPost} />)
     expect(screen.getByText('Uma descrição interessante')).toBeInTheDocument()
   })
 
   it('tem link para /blog/[slug]', () => {
-    render(<BlogPostCard post={mockPost} />)
-    expect(screen.getByRole('link')).toHaveAttribute('href', '/blog/meu-primeiro-post')
+    expect(screen.getByRole('link', { name: /meu primeiro post/i })).toHaveAttribute(
+      'href',
+      '/blog/meu-primeiro-post'
+    )
   })
 
   it('renderiza a tag', () => {
-    render(<BlogPostCard post={mockPost} />)
     expect(screen.getByText('psicologia')).toBeInTheDocument()
   })
 })

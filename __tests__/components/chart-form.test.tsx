@@ -7,8 +7,16 @@ jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }))
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const originalFetch = (global as any).fetch
+
 beforeEach(() => {
   mockPush.mockClear()
+})
+
+afterEach(() => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ;(global as any).fetch = originalFetch
 })
 
 describe('ChartForm', () => {
@@ -53,19 +61,18 @@ describe('ChartForm', () => {
   it('navega com params corretos ao submeter', () => {
     render(<ChartForm initialData="1990-03-15" initialLat="-23.55" initialLng="-46.63" initialCidade="São Paulo" />)
     fireEvent.submit(screen.getByRole('button', { name: /calcular mapa astral/i }).closest('form')!)
-    expect(mockPush).toHaveBeenCalledWith(
-      expect.stringContaining('/mapa-astral?')
-    )
+    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('/mapa-astral?'))
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('data=1990-03-15'))
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('lat=-23.55'))
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('lng=-46.63'))
   })
 
   it('exibe erro quando busca de cidade falha', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+;(global as any).fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: async () => [],
-    }) as jest.Mock
+    } as Response)
 
     render(<ChartForm initialCidade="XYZ Inexistente" />)
     fireEvent.click(screen.getByRole('button', { name: /buscar/i }))
@@ -76,12 +83,13 @@ describe('ChartForm', () => {
   })
 
   it('exibe resultados de cidade quando busca retorna dados', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+;(global as any).fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: async () => [
         { display_name: 'São Paulo, Brasil', lat: '-23.55', lon: '-46.63' },
       ],
-    }) as jest.Mock
+    } as Response)
 
     render(<ChartForm initialCidade="São Paulo" />)
     fireEvent.click(screen.getByRole('button', { name: /buscar/i }))

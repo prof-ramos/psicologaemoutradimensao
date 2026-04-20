@@ -76,6 +76,8 @@ export default async function PostPage({ params }: PostPageProps) {
             src={post.image}
             alt={post.title}
             fill
+            priority
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 75vw, 768px"
             className="object-cover"
           />
         </div>
