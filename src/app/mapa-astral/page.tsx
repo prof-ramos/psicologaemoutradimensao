@@ -52,7 +52,7 @@ export default async function MapaAstralPage({ searchParams }: PageProps) {
       <div className="border-b-2 border-border bg-cosmic-blue px-4 py-10 md:py-14">
         <div className="mx-auto max-w-6xl flex flex-col gap-3">
           <div className="inline-flex items-center gap-2 border-2 border-border bg-foreground self-start px-3 py-1">
-            <Globe className="h-3 w-3 text-cosmic-blue fill-cosmic-blue" />
+            <Globe className="h-3 w-3 text-cosmic-blue fill-cosmic-blue" aria-hidden="true" />
             <span className="font-heading text-xs font-black tracking-widest text-background uppercase">
               100% Open Source
             </span>

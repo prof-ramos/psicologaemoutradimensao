@@ -71,7 +71,7 @@ export default async function PostPage({ params }: PostPageProps) {
       </header>
 
       {post.image && (
-        <div className="relative border-2 border-border shadow-shadow" style={{ aspectRatio: '16/9' }}>
+        <div className="relative aspect-video border-2 border-border shadow-shadow">
           <Image
             src={post.image}
             alt={post.title}

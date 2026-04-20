@@ -10,5 +10,8 @@ export function signOgImageUrl({ title }: { title: string }): string {
     .createHmac('sha256', config.ogImageSecret)
     .update(params.toString())
     .digest('hex')
-  return `${config.baseUrl}/api/og?${params}&sig=${signature}`
+  const url = new URL('/api/og', config.baseUrl)
+  params.forEach((value, key) => url.searchParams.set(key, value))
+  url.searchParams.set('sig', signature)
+  return url.toString()
 }

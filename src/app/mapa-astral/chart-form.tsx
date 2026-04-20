@@ -134,9 +134,18 @@ export function ChartForm({
         )}
 
         {geo.results.length > 0 && (
-          <ul className="border-2 border-border bg-background">
+          <ul
+            role="listbox"
+            aria-label="Resultados de cidades"
+            className="border-2 border-border bg-background"
+          >
             {geo.results.map((r, i) => (
-              <li key={i} className={i > 0 ? 'border-t border-border' : ''}>
+              <li
+                key={i}
+                role="option"
+                aria-selected={cityName === r.display_name.split(',')[0].trim()}
+                className={i > 0 ? 'border-t border-border' : ''}
+              >
                 <button
                   type="button"
                   onClick={() => selectCity(r)}

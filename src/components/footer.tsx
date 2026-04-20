@@ -11,6 +11,7 @@ export function Footer() {
           href="https://x.com/Gayaliz_"
           target="_blank"
           rel="noopener noreferrer"
+          aria-label="Abrir perfil @Gayaliz_ no X em nova aba"
           className="font-heading text-sm font-bold hover:underline"
         >
           @Gayaliz_

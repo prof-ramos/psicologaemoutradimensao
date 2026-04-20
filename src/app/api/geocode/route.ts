@@ -1,3 +1,10 @@
+interface NominatimResult {
+  display_name: string
+  lat: string
+  lon: string
+  [key: string]: unknown
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const q = searchParams.get('q') ?? ''
@@ -25,7 +32,7 @@ export async function GET(request: Request) {
       return Response.json({ error: 'Serviço de geocoding indisponível' }, { status: 502 })
     }
 
-    const data = await res.json()
+    const data: NominatimResult[] = await res.json()
     return Response.json(data)
   } catch {
     return Response.json({ error: 'Erro interno' }, { status: 500 })
