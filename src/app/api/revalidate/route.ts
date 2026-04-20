@@ -25,7 +25,10 @@ export async function POST(request: Request) {
     revalidatePath('/', 'layout')
   } catch (err) {
     console.error('revalidatePath error:', err)
-    return Response.json({ revalidated: false, error: String(err), now: Date.now() }, { status: 500 })
+    return Response.json(
+      { revalidated: false, message: 'Internal server error', now: Date.now() },
+      { status: 500 }
+    )
   }
 
   return Response.json({ revalidated: true, now: Date.now() })

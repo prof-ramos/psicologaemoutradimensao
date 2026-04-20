@@ -17,12 +17,24 @@ const spaceGrotesk = Space_Grotesk({
   display: 'swap',
 })
 
+const metadataTitle = config.blog.metadata.title
+const resolvedDefaultTitle =
+  typeof metadataTitle === 'string' ? metadataTitle : metadataTitle.default
+
 export const metadata: Metadata = {
-  title: config.blog.metadata.title,
+  title: metadataTitle,
   description: config.blog.metadata.description,
   openGraph: {
-    title: config.blog.metadata.title.default,
+    title: resolvedDefaultTitle,
     description: config.blog.metadata.description,
+  },
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: '256x256', type: 'image/x-icon' },
+      { url: '/icon.png', sizes: '192x192', type: 'image/png' },
+    ],
+    shortcut: [{ url: '/favicon.ico', type: 'image/x-icon' }],
+    apple: [{ url: '/apple-icon.png', sizes: '180x180', type: 'image/png' }],
   },
 }
 

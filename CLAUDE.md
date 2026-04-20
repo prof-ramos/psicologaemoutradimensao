@@ -143,15 +143,21 @@ ChartDetails     → tabela de posições + ASC/MC + aspectos
 
 ### Tema neobrutalism
 
-Definido em `globals.css` via `@theme`:
+O sistema visual oficial é **NeoBrutalismo**.
 
-| Token | Valor | Uso |
-| --- | --- | --- |
-| `--color-main` | `#ccff00` | Navbar, botões, planetas no gráfico |
-| `--color-cosmic-blue` | `#4db8ff` | Badge blue, label ASC |
-| `--color-vibrant-pink` | `#ff99cc` | Badge pink, label MC |
-| `--color-electric-orange` | `#ff6600` | Badge orange |
-| `--shadow-shadow` | `0.25rem 0.25rem 0 0 #000` | Sombra sólida dos cards |
+- Fonte de verdade: `docs/design/neobrutalism-system.md`
+- Base local: `src/app/globals.css`
+- Referência externa: `https://context7.com/ekmas/neobrutalism-components/llms.txt?tokens=10000`
+- Context7 library ID: `/ekmas/neobrutalism-components`
+
+Princípios não negociáveis:
+
+- `border-2 border-border` como linguagem padrão
+- `shadow-shadow` com sombra dura deslocada, não sombra suave
+- contraste alto entre `background`, `foreground`, `main` e `border`
+- `radius-base` contido, sem arredondamento excessivo
+- componentes com presença física e leitura direta
+- hierarquia visual pode evoluir, mas sem abandonar o caráter neobrutalist
 
 ### ISR e publicação de posts
 

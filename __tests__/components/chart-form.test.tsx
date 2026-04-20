@@ -63,14 +63,14 @@ describe('ChartForm', () => {
     const button = screen.getByRole('button', { name: /calcular mapa astral/i })
     const form = button.closest('form')
     expect(form).toBeInTheDocument()
-    if (form) fireEvent.submit(form)
+    fireEvent.submit(form as HTMLFormElement)
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('/mapa-astral?'))
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('data=1990-03-15'))
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('lat=-23.55'))
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('lng=-46.63'))
   })
 
-  it('exibe erro quando busca de cidade falha', async () => {
+  it('exibe mensagem quando busca de cidade retorna sem resultados', async () => {
     globalThis.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: async () => [],
@@ -111,10 +111,13 @@ describe('ChartForm', () => {
     })
   })
 
-  it('time field opcional não bloqueia submit', () => {
+  it('inclui hora na navegação quando o campo é informado', () => {
     render(<ChartForm initialDate="1990-03-15" initialLat="-23.55" initialLng="-46.63" initialHora="14:30" />)
     const submit = screen.getByRole('button', { name: /calcular mapa astral/i })
-    expect(submit).not.toBeDisabled()
+    const form = submit.closest('form')
+    expect(form).toBeInTheDocument()
+    fireEvent.submit(form as HTMLFormElement)
+    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('hora=14%3A30'))
   })
 
   it('exibe múltiplos resultados de cidade e permite selecionar', async () => {
@@ -136,5 +139,11 @@ describe('ChartForm', () => {
       expect(screen.getByText('São Paulo, SP, Brasil')).toBeInTheDocument()
       expect(screen.getByText('São Bernardo do Campo, SP, Brasil')).toBeInTheDocument()
     })
+
+    fireEvent.click(screen.getByText('São Bernardo do Campo, SP, Brasil'))
+
+    expect(screen.getByLabelText(/cidade de nascimento/i)).toHaveValue('São Bernardo do Campo')
+    expect(screen.getByText(/-23\.69°/)).toBeInTheDocument()
+    expect(screen.getByText(/-46\.54°/)).toBeInTheDocument()
   })
 })

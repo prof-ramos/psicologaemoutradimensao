@@ -10,17 +10,20 @@ interface ChartSVGProps {
 export function ChartSVG({ data }: ChartSVGProps) {
   const rawId   = useId()
   const chartId = rawId.replace(/:/g, 'c')
-  const ref     = useRef<HTMLDivElement>(null)
+  const mountRef = useRef<HTMLDivElement>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (!ref.current) return
+    const container = mountRef.current
+    if (!container) return
 
-    const container = ref.current
+    let cancelled = false
     const size = container.clientWidth || 500
+    const hasFullHouses = data.hasHouses && data.cusps.length === 12
+    setIsLoading(true)
 
     import('@astrodraw/astrochart').then(({ Chart }) => {
-      if (!container) return
+      if (cancelled || !container.isConnected) return
       container.innerHTML = ''
 
       const chart = new Chart(chartId, size, size, {
@@ -28,13 +31,13 @@ export function ChartSVG({ data }: ChartSVGProps) {
         MARGIN:       60,
       })
 
-      const cusps = data.hasHouses && data.cusps.length === 12
+      const cusps = hasFullHouses
         ? data.cusps
         : [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]
 
       const radix = chart.radix({ planets: data.planets, cusps })
 
-      if (data.hasHouses && data.cusps.length === 12) {
+      if (hasFullHouses) {
         radix.addPointsOfInterest({
           As: [data.cusps[0]],
           Ic: [data.cusps[3]],
@@ -44,44 +47,44 @@ export function ChartSVG({ data }: ChartSVGProps) {
       }
 
       radix.aspects()
-      setIsLoading(false)
+
+      if (!cancelled) {
+        setIsLoading(false)
+      }
+    }).catch((err) => {
+      console.error('astrochart import error:', err)
+      if (!cancelled) {
+        container.textContent = 'Não foi possível carregar o gráfico.'
+        setIsLoading(false)
+      }
     })
+
+    return () => {
+      cancelled = true
+      if (container.isConnected) {
+        container.replaceChildren()
+      }
+    }
   }, [data, chartId])
 
   return (
-    <figure className="rounded-[1.9rem] border border-border/10 bg-surface p-5 shadow-[var(--shadow-shadow)] lg:sticky lg:top-6">
-      <div className="mb-4 flex items-end justify-between gap-4">
-        <div>
-          <p className="font-heading text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-foreground/52">
-            Visualização
-          </p>
-          <h2 className="mt-2 font-heading text-2xl font-semibold tracking-[-0.04em] text-foreground">
-            Roda zodiacal
-          </h2>
-        </div>
-        <p className="max-w-[11rem] text-right text-xs leading-5 text-muted-foreground">
-          O gráfico concentra o desenho geral do mapa e os principais eixos.
-        </p>
-      </div>
-      <div className="rounded-[1.5rem] border border-border/10 bg-[radial-gradient(circle_at_top,rgba(168,198,240,0.18),transparent_42%),#fdfdfc] p-3">
+    <figure>
+      <div className="border-2 border-border shadow-shadow w-full aspect-square bg-white">
         <div
-          id={chartId}
-          ref={ref}
-          className="aspect-square w-full overflow-hidden rounded-[1.2rem] bg-white"
+          className="relative aspect-square w-full overflow-hidden rounded-[1.2rem] bg-white"
           role="img"
           aria-label="Roda zodiacal do mapa natal"
           aria-busy={isLoading}
         >
+          <div id={chartId} ref={mountRef} className="h-full w-full" />
           {isLoading && (
-            <div className="flex h-full w-full items-center justify-center text-sm text-muted-foreground">
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
               Carregando gráfico…
             </div>
           )}
         </div>
       </div>
-      <figcaption className="mt-4 text-sm leading-6 text-muted-foreground">
-        Mapa gerado a partir dos dados informados, com foco na leitura visual rápida da configuração natal.
-      </figcaption>
+      <figcaption className="sr-only">Roda zodiacal do mapa natal</figcaption>
     </figure>
   )
 }

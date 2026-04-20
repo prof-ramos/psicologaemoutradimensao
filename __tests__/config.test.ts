@@ -1,12 +1,12 @@
 describe('config', () => {
-  const originalEnv = process.env
+  const originalEnv = { ...process.env }
 
   beforeEach(() => {
     process.env = { ...originalEnv }
   })
 
   afterEach(() => {
-    process.env = originalEnv
+    process.env = { ...originalEnv }
   })
 
   it('throws when NEXT_PUBLIC_BLOG_ID is missing', () => {
