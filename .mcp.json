@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "memory-bank": {
+      "name": "Memory Bank MCP",
+      "command": "server-memory",
+      "args": [],
+      "env": {}
+    },
+    "sequential-thinking": {
+      "name": "Sequential Thinking MCP",
+      "command": "code-reasoning",
+      "args": [],
+      "env": {}
+    },
+    "brave-search": {
+      "name": "Brave Search MCP",
+      "command": "server-brave-search",
+      "args": [],
+      "env": {}
+    },
+    "deep-graph": {
+      "name": "Deep Graph MCP (Code Graph)",
+      "command": "mcp-code-graph",
+      "args": [],
+      "env": {}
+    }
+  }
+}
