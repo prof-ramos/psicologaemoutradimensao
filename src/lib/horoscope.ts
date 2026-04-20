@@ -50,6 +50,7 @@ export type HoroscopeInput = {
 }
 
 export function calculateHoroscope(input: HoroscopeInput): HoroscopeResult {
+  try {
   const origin = new (Origin as any)({
     year:      input.year,
     month:     input.month - 1,   // Origin usa meses 0-indexed
@@ -142,4 +143,9 @@ export function calculateHoroscope(input: HoroscopeInput): HoroscopeResult {
   }
 
   return { planets, cusps, positions, aspects, hasHouses: input.hasTime, ascendant, midheaven }
+  } catch (err) {
+    throw new Error(
+      `Falha no cálculo do mapa astral: ${err instanceof Error ? err.message : 'erro desconhecido'}`
+    )
+  }
 }

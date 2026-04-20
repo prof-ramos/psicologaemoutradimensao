@@ -1,4 +1,4 @@
-/** Mapa body.key (lowercase) → nome em pt-BR */
+// body.key (lowercase) from circular-natal-horoscope-js → pt-BR label
 export const PLANET_PT: Record<string, string> = {
   sun:       'Sol',
   moon:      'Lua',
@@ -16,7 +16,7 @@ export const PLANET_PT: Record<string, string> = {
   lilith:    'Lilith',
 }
 
-/** Sign.label (English, Title Case) → nome em pt-BR */
+// Sign.label (Title Case, English) from the lib → pt-BR label
 export const SIGN_PT: Record<string, string> = {
   Aries:       'Áries',
   Taurus:      'Touro',
@@ -32,7 +32,7 @@ export const SIGN_PT: Record<string, string> = {
   Pisces:      'Peixes',
 }
 
-/** aspect.aspectKey (lowercase) → nome em pt-BR */
+// aspect.aspectKey (lowercase) from the lib → pt-BR label
 export const ASPECT_PT: Record<string, string> = {
   conjunction: 'Conjunção',
   opposition:  'Oposição',

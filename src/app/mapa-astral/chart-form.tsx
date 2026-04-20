@@ -4,72 +4,52 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Search, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-
-interface GeoResult {
-  display_name: string
-  lat: string
-  lon: string
-}
+import { useGeocode } from './use-geocode'
 
 interface ChartFormProps {
-  initialData?: string
-  initialHora?: string
+  initialData?:   string
+  initialHora?:   string
   initialCidade?: string
-  initialLat?: string
-  initialLng?: string
+  initialLat?:    string
+  initialLng?:    string
 }
 
 export function ChartForm({
-  initialData  = '',
-  initialHora  = '',
+  initialData   = '',
+  initialHora   = '',
   initialCidade = '',
-  initialLat   = '',
-  initialLng   = '',
+  initialLat    = '',
+  initialLng    = '',
 }: ChartFormProps) {
   const router = useRouter()
-  const [data,       setData]       = useState(initialData)
-  const [hora,       setHora]       = useState(initialHora)
-  const [cidade,     setCidade]     = useState(initialCidade)
-  const [lat,        setLat]        = useState(initialLat)
-  const [lng,        setLng]        = useState(initialLng)
-  const [geoResults, setGeoResults] = useState<GeoResult[]>([])
-  const [isSearching,setIsSearching]= useState(false)
-  const [geoError,   setGeoError]   = useState('')
-  const [isPending,  startTransition]= useTransition()
+  const [birthDate, setBirthDate] = useState(initialData)
+  const [birthTime, setBirthTime] = useState(initialHora)
+  const [cityName,  setCityName]  = useState(initialCidade)
+  const [lat,       setLat]       = useState(initialLat)
+  const [lng,       setLng]       = useState(initialLng)
+  const [isPending, startTransition] = useTransition()
 
-  async function handleCitySearch() {
-    if (!cidade.trim()) return
-    setIsSearching(true)
-    setGeoError('')
-    setGeoResults([])
-    try {
-      const res = await fetch(`/api/geocode?q=${encodeURIComponent(cidade)}`)
-      const json = await res.json()
-      if (!Array.isArray(json) || json.length === 0) {
-        setGeoError('Nenhuma cidade encontrada.')
-      } else {
-        setGeoResults(json.slice(0, 5))
-      }
-    } catch {
-      setGeoError('Erro ao buscar cidade.')
-    } finally {
-      setIsSearching(false)
-    }
+  const geo = useGeocode()
+
+  function handleCityChange(value: string) {
+    setCityName(value)
+    setLat('')
+    setLng('')
   }
 
-  function selectCity(result: GeoResult) {
-    setCidade(result.display_name.split(',')[0].trim())
+  function selectCity(result: { display_name: string; lat: string; lon: string }) {
+    setCityName(result.display_name.split(',')[0].trim())
     setLat(result.lat)
     setLng(result.lon)
-    setGeoResults([])
+    geo.clear()
   }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!data || !lat || !lng) return
-    const params = new URLSearchParams({ data, lat, lng })
-    if (hora)   params.set('hora',   hora)
-    if (cidade) params.set('cidade', cidade)
+    if (!birthDate || !lat || !lng) return
+    const params = new URLSearchParams({ data: birthDate, lat, lng })
+    if (birthTime) params.set('hora',   birthTime)
+    if (cityName)  params.set('cidade', cityName)
     startTransition(() => {
       router.push(`/mapa-astral?${params.toString()}`)
     })
@@ -79,7 +59,6 @@ export function ChartForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 
-        {/* Data */}
         <div className="space-y-1">
           <label
             htmlFor="nascimento-data"
@@ -91,13 +70,12 @@ export function ChartForm({
             id="nascimento-data"
             type="date"
             required
-            value={data}
-            onChange={e => setData(e.target.value)}
+            value={birthDate}
+            onChange={e => setBirthDate(e.target.value)}
             className="w-full border-2 border-border bg-background px-3 py-2 font-base text-sm shadow-shadow focus:outline-none focus:ring-2 focus:ring-border"
           />
         </div>
 
-        {/* Hora */}
         <div className="space-y-1">
           <label
             htmlFor="nascimento-hora"
@@ -109,11 +87,11 @@ export function ChartForm({
           <input
             id="nascimento-hora"
             type="time"
-            value={hora}
-            onChange={e => setHora(e.target.value)}
+            value={birthTime}
+            onChange={e => setBirthTime(e.target.value)}
             className="w-full border-2 border-border bg-background px-3 py-2 font-base text-sm shadow-shadow focus:outline-none focus:ring-2 focus:ring-border"
           />
-          {!hora && (
+          {!birthTime && (
             <p className="font-base text-xs text-muted-foreground">
               Sem horário, casas e Ascendente não serão calculados.
             </p>
@@ -121,7 +99,6 @@ export function ChartForm({
         </div>
       </div>
 
-      {/* Cidade */}
       <div className="space-y-1">
         <label
           htmlFor="nascimento-cidade"
@@ -133,18 +110,18 @@ export function ChartForm({
           <input
             id="nascimento-cidade"
             type="text"
-            value={cidade}
-            onChange={e => { setCidade(e.target.value); setLat(''); setLng('') }}
+            value={cityName}
+            onChange={e => handleCityChange(e.target.value)}
             placeholder="Ex: São Paulo"
             className="flex-1 border-2 border-border bg-background px-3 py-2 font-base text-sm shadow-shadow focus:outline-none focus:ring-2 focus:ring-border"
           />
           <Button
             type="button"
             variant="outline"
-            onClick={handleCitySearch}
-            disabled={isSearching || !cidade.trim()}
+            onClick={() => geo.search(cityName)}
+            disabled={geo.isSearching || !cityName.trim()}
           >
-            {isSearching
+            {geo.isSearching
               ? <Loader2 className="h-4 w-4 animate-spin" />
               : <Search className="h-4 w-4" />
             }
@@ -152,13 +129,13 @@ export function ChartForm({
           </Button>
         </div>
 
-        {geoError && (
-          <p className="font-base text-xs text-electric-orange font-bold">{geoError}</p>
+        {geo.error && (
+          <p className="font-base text-xs text-electric-orange font-bold">{geo.error}</p>
         )}
 
-        {geoResults.length > 0 && (
+        {geo.results.length > 0 && (
           <ul className="border-2 border-border bg-background">
-            {geoResults.map((r, i) => (
+            {geo.results.map((r, i) => (
               <li key={i} className={i > 0 ? 'border-t border-border' : ''}>
                 <button
                   type="button"
@@ -182,7 +159,7 @@ export function ChartForm({
       <Button
         type="submit"
         size="lg"
-        disabled={!data || !lat || !lng || isPending}
+        disabled={!birthDate || !lat || !lng || isPending}
       >
         {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
         Calcular mapa astral
