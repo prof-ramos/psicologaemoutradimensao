@@ -2,9 +2,9 @@ import { Footer } from '@/components/footer'
 import { render, screen } from '@testing-library/react'
 
 describe('Footer', () => {
-  it('tem link para @Gayaliz_ no X', () => {
+  it('tem link para o Twitter', () => {
     render(<Footer />)
-    const link = screen.getByRole('link', { name: /@gayaliz_/i })
+    const link = screen.getByRole('link', { name: /abrir perfil @gayaliz_ no x em nova aba/i })
     expect(link).toBeInTheDocument()
     expect(link).toHaveAttribute('href', 'https://x.com/Gayaliz_')
   })
@@ -16,7 +16,7 @@ describe('Footer', () => {
 
   it('link do X tem aria-label descritivo', () => {
     render(<Footer />)
-    const link = screen.getByRole('link', { name: /@gayaliz_/i })
-    expect(link).toHaveAttribute('aria-label', expect.stringContaining('nova aba'))
+    const link = screen.getByRole('link', { name: /abrir perfil @gayaliz_ no x em nova aba/i })
+    expect(link).toHaveAttribute('aria-label', expect.stringMatching(/nova aba/i))
   })
 })

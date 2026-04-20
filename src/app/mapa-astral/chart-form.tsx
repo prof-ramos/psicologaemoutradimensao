@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Loader2, Search } from 'lucide-react'
+import { Loader2, Search, Globe } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import { useGeocode } from './use-geocode'
@@ -63,128 +63,150 @@ export function ChartForm({
   const hasValidCoords = Number.isFinite(nLat) && Number.isFinite(nLng)
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="space-y-1">
-          <label
-            htmlFor="nascimento-data"
-            className="font-heading text-sm font-black uppercase tracking-wide"
-          >
+    <div className="border-2 border-border bg-background p-6 shadow-shadow md:p-8">
+      <form onSubmit={handleSubmit} className="space-y-8">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          {/* Data de Nascimento */}
+          <div className="space-y-2">
+            <label
+              htmlFor="nascimento-data"
+              className="font-heading text-sm font-black uppercase tracking-wider text-foreground"
+            >
               Data de nascimento *
-          </label>
-          <input
-            id="nascimento-data"
-            type="date"
-            required
-            value={birthDate}
-            onChange={e => setBirthDate(e.target.value)}
-            className="w-full border-2 border-border bg-background px-3 py-2 font-base text-sm shadow-shadow focus:outline-none focus:ring-2 focus:ring-border"
-          />
+            </label>
+            <input
+              id="nascimento-data"
+              type="date"
+              required
+              aria-required="true"
+              value={birthDate}
+              onChange={e => setBirthDate(e.target.value)}
+              className="w-full border-2 border-border bg-secondary-background px-4 py-3 font-base text-sm shadow-shadow focus:outline-none focus:ring-2 focus:ring-main transition-all"
+            />
+          </div>
+
+          {/* Hora de Nascimento */}
+          <div className="space-y-2">
+            <label
+              htmlFor="nascimento-hora"
+              className="font-heading text-sm font-black uppercase tracking-wider text-foreground"
+            >
+              Hora de nascimento{' '}
+              <span className="font-normal normal-case text-muted-foreground opacity-70">
+                (opcional)
+              </span>
+            </label>
+            <div className="flex flex-col gap-2">
+              <input
+                id="nascimento-hora"
+                type="time"
+                value={birthTime}
+                onChange={e => setBirthTime(e.target.value)}
+                className="w-full border-2 border-border bg-secondary-background px-4 py-3 font-base text-sm shadow-shadow focus:outline-none focus:ring-2 focus:ring-main transition-all"
+              />
+              {!birthTime && (
+                <p className="font-base text-[10px] leading-tight text-muted-foreground italic">
+                  Sem horário, casas e Ascendente não serão calculados.
+                </p>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div className="space-y-1">
+        {/* Cidade de Nascimento */}
+        <div className="space-y-3">
           <label
-            htmlFor="nascimento-hora"
-            className="font-heading text-sm font-black uppercase tracking-wide"
+            htmlFor="nascimento-cidade"
+            className="font-heading text-sm font-black uppercase tracking-wider text-foreground"
           >
-            Hora de nascimento{' '}
-            <span className="font-normal normal-case text-muted-foreground">(opcional)</span>
+            Cidade de nascimento *
           </label>
-          <input
-            id="nascimento-hora"
-            type="time"
-            value={birthTime}
-            onChange={e => setBirthTime(e.target.value)}
-            className="w-full border-2 border-border bg-background px-3 py-2 font-base text-sm shadow-shadow focus:outline-none focus:ring-2 focus:ring-border"
-          />
-          {!birthTime && (
-            <p className="font-base text-xs text-muted-foreground">
-              Sem horário, casas e Ascendente não serão calculados.
-            </p>
-          )}
-        </div>
-      </div>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="relative flex-1">
+              <input
+                id="nascimento-cidade"
+                type="text"
+                required
+                aria-required="true"
+                value={cityName}
+                onChange={e => handleCityChange(e.target.value)}
+                placeholder="Ex: São Paulo"
+                className="w-full border-2 border-border bg-secondary-background px-4 py-3 font-base text-sm shadow-shadow focus:outline-none focus:ring-2 focus:ring-main transition-all"
+              />
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              className="w-full sm:w-auto"
+              onClick={() => geo.search(cityName)}
+              disabled={geo.isSearching || !cityName.trim()}
+            >
+              {geo.isSearching ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Search className="h-4 w-4" />
+              )}
+              <span>Buscar</span>
+            </Button>
+          </div>
 
-      <div className="space-y-1">
-        <label
-          htmlFor="nascimento-cidade"
-          className="font-heading text-sm font-black uppercase tracking-wide"
-        >
-          Cidade de nascimento *
-        </label>
-        <div className="flex gap-2">
-          <input
-            id="nascimento-cidade"
-            type="text"
-            required
-            aria-required="true"
-            value={cityName}
-            onChange={e => handleCityChange(e.target.value)}
-            placeholder="Ex: São Paulo"
-            className="flex-1 border-2 border-border bg-background px-3 py-2 font-base text-sm shadow-shadow focus:outline-none focus:ring-2 focus:ring-border"
-          />
+          {/* Feedback e Resultados de Geocoding */}
+          <div className="space-y-2">
+            {geo.error && (
+              <p className="border-2 border-border bg-electric-orange/10 px-3 py-1.5 font-base text-xs font-bold text-electric-orange" role="alert">
+                {geo.error}
+              </p>
+            )}
+
+            {geo.results.length > 0 && (
+              <div aria-live="polite" aria-atomic="true" className="overflow-hidden border-2 border-border bg-background shadow-shadow">
+                <ul role="listbox" aria-label="Resultados de cidades" className="divide-y-2 divide-border">
+                  {geo.results.map((r) => (
+                    <li
+                      key={r.place_id ?? r.osm_id ?? `${r.lat}-${r.lon}`}
+                      role="option"
+                      aria-selected={cityName === (r.display_name.split(',')[0]?.trim())}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => selectCity(r)}
+                        className="w-full px-4 py-3 text-left font-base text-sm hover:bg-main hover:text-main-foreground transition-all focus:outline-none focus:bg-main focus:text-main-foreground"
+                      >
+                        {r.display_name}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {hasValidCoords && (
+              <p className="inline-flex items-center gap-2 border-2 border-border bg-main/20 px-3 py-1 font-base text-xs font-bold text-foreground shadow-sm">
+                <span className="text-main-foreground">✓</span> {cityName} selecionada ({nLat.toFixed(2)}°, {nLng.toFixed(2)}°)
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Submit */}
+        <div className="pt-4">
           <Button
-            type="button"
-            variant="outline"
-            onClick={() => geo.search(cityName)}
-            disabled={geo.isSearching || !cityName.trim()}
+            type="submit"
+            variant="cosmic"
+            size="lg"
+            className="w-full md:w-auto md:min-w-[240px]"
+            disabled={!birthDate || !lat || !lng || isPending}
           >
-            {geo.isSearching
-              ? <Loader2 className="h-4 w-4 animate-spin" />
-              : <Search className="h-4 w-4" />
-            }
-            Buscar
+            {isPending ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <Globe className="h-5 w-5" />
+            )}
+            <span>Calcular Mapa Astral</span>
           </Button>
         </div>
-
-        {geo.error && (
-          <p className="font-base text-xs text-electric-orange font-bold" role="alert">
-            {geo.error}
-          </p>
-        )}
-
-        {geo.results.length > 0 && (
-          <div aria-live="polite" aria-atomic="true">
-            <ul
-              role="listbox"
-              aria-label="Resultados de cidades"
-              className="border-2 border-border bg-background"
-            >
-              {geo.results.map((r) => (
-                <li
-                  key={r.place_id ?? r.osm_id ?? `${r.lat}-${r.lon}`}
-                  role="option"
-                  aria-selected={cityName === (r.display_name.split(',')[0]?.trim())}
-                  className="first:border-0 border-t border-border"
-                >
-                  <button
-                    type="button"
-                    onClick={() => selectCity(r)}
-                    className="w-full px-3 py-2 text-left font-base text-sm hover:bg-main transition-colors"
-                  >
-                    {r.display_name}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {hasValidCoords && (
-          <p className="font-base text-xs text-muted-foreground">
-            ✓ Localização selecionada — {nLat.toFixed(2)}°, {nLng.toFixed(2)}°
-          </p>
-        )}
-      </div>
-
-      <Button
-        type="submit"
-        size="lg"
-        disabled={!birthDate || !lat || !lng || isPending}
-      >
-        {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-        Calcular mapa astral
-      </Button>
-    </form>
+      </form>
+    </div>
   )
 }

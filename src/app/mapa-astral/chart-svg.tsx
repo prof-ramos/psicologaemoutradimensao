@@ -68,23 +68,37 @@ export function ChartSVG({ data }: ChartSVGProps) {
   }, [data, chartId])
 
   return (
-    <figure>
-      <div className="border-2 border-border shadow-shadow w-full aspect-square bg-white">
-        <div
-          className="relative aspect-square w-full overflow-hidden rounded-[1.2rem] bg-white"
-          role="img"
-          aria-label="Roda zodiacal do mapa natal"
-          aria-busy={isLoading}
-        >
-          <div id={chartId} ref={mountRef} className="h-full w-full" />
-          {isLoading && (
-            <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
-              Carregando gráfico…
-            </div>
-          )}
+    <figure className="space-y-4">
+      <div className="relative group">
+        {/* Decorativo: Moldura externa neobrutalist */}
+        <div className="absolute -inset-2 bg-main border-2 border-border -z-10 translate-x-1 translate-y-1 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform" />
+        
+        <div className="border-2 border-border shadow-shadow w-full aspect-square bg-white overflow-hidden">
+          <div
+            className="relative aspect-square w-full bg-white"
+            role="img"
+            aria-label="Roda zodiacal do mapa natal"
+            aria-busy={isLoading}
+          >
+            <div id={chartId} ref={mountRef} className="h-full w-full" />
+            {isLoading && (
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/80">
+                <div className="flex flex-col items-center gap-3">
+                  <div className="h-10 w-10 border-4 border-t-main border-border animate-spin" />
+                  <p className="font-heading text-sm font-black uppercase tracking-widest">
+                    Carregando Gráfico...
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-      <figcaption className="sr-only">Roda zodiacal do mapa natal</figcaption>
+      
+      <figcaption className="flex items-center gap-2 font-base text-xs text-muted-foreground italic">
+        <span className="h-2 w-2 rounded-full bg-main border border-border" />
+        Roda zodiacal calculada com precisão astronômica
+      </figcaption>
     </figure>
   )
 }

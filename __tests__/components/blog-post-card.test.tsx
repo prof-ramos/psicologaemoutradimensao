@@ -1,4 +1,6 @@
 import { BlogPostCard } from '@/components/blog-post-card'
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 import { render, screen } from '@testing-library/react'
 
 const mockPost = {
@@ -7,7 +9,7 @@ const mockPost = {
   title: 'Meu Primeiro Post',
   description: 'Uma descrição interessante',
   image: null,
-  publishedAt: new Date('2026-01-15'),
+  publishedAt: new Date('2026-01-15T12:00:00Z'),
   tags: [{ id: '1', name: 'psicologia' }],
 }
 
@@ -17,7 +19,7 @@ const mockPostWithImage = {
   title: 'Meu Segundo Post',
   description: 'Descrição do segundo post',
   image: 'https://example.com/img.jpg',
-  publishedAt: new Date('2026-01-15'),
+  publishedAt: new Date('2026-01-15T12:00:00Z'),
   tags: [],
 }
 
@@ -59,6 +61,7 @@ describe('BlogPostCard', () => {
 
   it('renderiza data formatada corretamente', () => {
     render(<BlogPostCard post={mockPost} />)
-    expect(screen.getByText(/15.*jan.*2026/i)).toBeInTheDocument()
+    const expectedDate = format(mockPost.publishedAt, "d 'de' MMMM 'de' yyyy", { locale: ptBR })
+    expect(screen.getByText(expectedDate)).toBeInTheDocument()
   })
 })

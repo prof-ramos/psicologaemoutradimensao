@@ -83,52 +83,86 @@ export default async function MapaAstralPage({ searchParams }: PageProps) {
   }
 
   return (
-    <main>
-
-      <div className="border-b-2 border-border bg-cosmic-blue px-4 py-10 md:py-14">
-        <div className="mx-auto max-w-6xl flex flex-col gap-3">
-          <div className="inline-flex items-center gap-2 border-2 border-border bg-foreground self-start px-3 py-1">
-            <Globe className="h-3 w-3 text-cosmic-blue fill-cosmic-blue" aria-hidden="true" />
-            <span className="font-heading text-xs font-black tracking-widest text-background uppercase">
-              100% Open Source
-            </span>
+    <main className="-mx-4 -mt-8 flex flex-col">
+      {/* ── Hero ── */}
+      <section className="relative overflow-hidden border-b-2 border-border bg-cosmic-blue pt-12 pb-16 md:pt-16 md:pb-24">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="flex flex-col gap-6">
+            <div className="inline-flex items-center gap-2 self-start border-2 border-border bg-foreground px-3 py-1.5 shadow-shadow">
+              <Globe className="h-4 w-4 text-cosmic-blue fill-cosmic-blue" aria-hidden="true" />
+              <span className="font-heading text-xs font-black uppercase tracking-widest text-background">
+                100% Open Source
+              </span>
+            </div>
+            
+            <div className="max-w-3xl space-y-4">
+              <h1 className="font-heading text-6xl font-black uppercase leading-[0.9] md:text-8xl lg:text-9xl">
+                Mapa <br />
+                <span className="text-white">Astral</span>
+              </h1>
+              <p className="max-w-lg font-base text-lg leading-relaxed text-foreground md:text-xl">
+                Descubra a configuração do céu no momento exato do seu nascimento. 
+                Gratuito, em português e sem bullshit.
+              </p>
+            </div>
           </div>
-          <h1 className="font-heading text-5xl font-black uppercase leading-none md:text-7xl">
-            Mapa Astral
-          </h1>
-          <p className="font-base text-base md:text-lg text-foreground/80 max-w-md">
-            Calcule seu mapa natal gratuitamente, em português.
-            Sem cadastro, sem cookies, sem bullshit.
-          </p>
         </div>
-      </div>
+      </section>
 
-      <div className="mx-auto max-w-6xl px-4 py-10 space-y-10">
-        <ChartForm
-          initialDate={params.data}
-          initialHora={params.hora}
-          initialCidade={params.cidade}
-          initialLat={params.lat}
-          initialLng={params.lng}
-        />
-
-        {calcError && (
-          <div role="alert" aria-live="assertive" className="border-2 border-border bg-electric-orange p-4 shadow-shadow">
-            <p className="font-heading font-black">{calcError}</p>
-          </div>
-        )}
-
-        {result && (
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-            <ChartSVGWrapper data={result} />
-            <ChartDetails
-              data={result}
-              cidade={params.cidade ?? ''}
-              dataStr={params.data!}
-              hora={params.hora}
+      {/* ── Conteúdo Principal ── */}
+      <div className="mx-auto max-w-6xl px-4 py-12 md:py-20">
+        <div className="flex flex-col gap-16 md:gap-24">
+          
+          {/* Seção do Formulário */}
+          <section id="configurar" className="scroll-mt-24">
+            <div className="mb-8 flex flex-col gap-2">
+              <h2 className="font-heading text-2xl font-black uppercase md:text-3xl">
+                Dados de Nascimento
+              </h2>
+              <p className="font-base text-muted-foreground">
+                Preencha os dados abaixo para calcular seu mapa natal completo.
+              </p>
+            </div>
+            <ChartForm
+              initialDate={params.data}
+              initialHora={params.hora}
+              initialCidade={params.cidade}
+              initialLat={params.lat}
+              initialLng={params.lng}
             />
-          </div>
-        )}
+          </section>
+
+          {/* Erro de cálculo */}
+          {calcError && (
+            <div role="alert" aria-live="assertive" className="border-2 border-border bg-electric-orange p-6 shadow-shadow">
+              <p className="font-heading text-lg font-black">{calcError}</p>
+            </div>
+          )}
+
+          {/* Resultado */}
+          {result && (
+            <section id="resultado" className="scroll-mt-24 space-y-12">
+              <div className="flex flex-col gap-2">
+                <h2 className="font-heading text-3xl font-black uppercase md:text-5xl">
+                  Seu Céu Natal
+                </h2>
+                <div className="h-1.5 w-24 bg-main border-2 border-border" />
+              </div>
+              
+              <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-start">
+                <div className="sticky top-24">
+                  <ChartSVGWrapper data={result} />
+                </div>
+                <ChartDetails
+                  data={result}
+                  cidade={params.cidade ?? ''}
+                  dataStr={params.data!}
+                  hora={params.hora}
+                />
+              </div>
+            </section>
+          )}
+        </div>
       </div>
     </main>
   )

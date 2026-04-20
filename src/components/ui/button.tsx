@@ -12,6 +12,8 @@ const buttonVariants = cva(
       variant: {
         default:
           'bg-main text-main-foreground shadow-shadow hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none',
+        cosmic:
+          'bg-cosmic-blue text-foreground shadow-shadow hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none',
         outline:
           'bg-background text-foreground shadow-shadow hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none',
         ghost: 'border-transparent shadow-none hover:bg-muted',
