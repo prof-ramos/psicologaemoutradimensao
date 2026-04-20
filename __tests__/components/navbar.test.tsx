@@ -16,4 +16,9 @@ describe('Navbar', () => {
     render(<Navbar name="Test" />)
     expect(screen.getByRole('link', { name: /contato/i })).toHaveAttribute('href', '/contato')
   })
+
+  it('tem link para /mapa-astral', () => {
+    render(<Navbar name="Test" />)
+    expect(screen.getByRole('link', { name: /mapa astral/i })).toHaveAttribute('href', '/mapa-astral')
+  })
 })

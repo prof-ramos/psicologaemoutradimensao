@@ -22,6 +22,12 @@ export function Navbar({ name }: NavbarProps) {
             Blog
           </Link>
           <Link
+            href="/mapa-astral"
+            className="font-heading font-bold text-main-foreground hover:underline"
+          >
+            Mapa Astral
+          </Link>
+          <Link
             href="/contato"
             className="font-heading font-bold text-main-foreground hover:underline"
           >
