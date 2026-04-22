@@ -22,12 +22,14 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
 
   let posts: Awaited<ReturnType<typeof getBlogPostsPage>>['posts'] = []
   let pagination: Awaited<ReturnType<typeof getBlogPostsPage>>['pagination'] = { page: 1, totalPosts: 0, limit: 6, totalPages: 1, nextPage: null, prevPage: null }
+  let fetchError = false
 
   try {
     const result = await getBlogPostsPage(page, limit)
     posts = result.posts
     pagination = result.pagination
   } catch (err) {
+    fetchError = true
     console.error('getBlogPostsPage error:', err)
   }
 
@@ -50,6 +52,13 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
             }}
           />
         </>
+      ) : fetchError ? (
+        <div className="border-2 border-border bg-vibrant-pink p-4 shadow-shadow">
+          <p className="font-heading text-lg font-black uppercase">Não foi possível carregar os posts.</p>
+          <p className="mt-2 font-base text-sm text-foreground/80">
+            Tente novamente em instantes. O conteúdo pode estar temporariamente indisponível.
+          </p>
+        </div>
       ) : (
         <p className="font-base text-muted-foreground">Nenhum post ainda.</p>
       )}

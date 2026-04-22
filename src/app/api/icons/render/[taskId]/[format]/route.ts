@@ -16,7 +16,7 @@ export async function POST(
     return Response.json({ error: 'Format deve ser png ou svg' }, { status: 400 })
   }
 
-  const apiKey = integrationsConfig.freepikApiKey?.trim()
+  const apiKey = integrationsConfig.freepikApiKey
   if (!apiKey) {
     console.error('icons/render error: Freepik API key is not configured')
     return Response.json({ error: 'FREEPIK_API_KEY não configurada' }, { status: 500 })

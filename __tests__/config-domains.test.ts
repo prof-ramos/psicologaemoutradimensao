@@ -18,7 +18,7 @@ describe('domain configs', () => {
   })
 
   it('siteConfig trims baseUrl and uses defaults', async () => {
-    process.env.NEXT_PUBLIC_BASE_URL = 'https://example.com \n'
+    process.env.NEXT_PUBLIC_BASE_URL = 'https://example.com/ \n'
     const { siteConfig } = await import('../src/config/site')
     expect(siteConfig.baseUrl).toBe('https://example.com')
     expect(siteConfig.blog.name).toBe('PsicologaEmOutraDimensão')
@@ -33,6 +33,14 @@ describe('domain configs', () => {
 
   it('integrationsConfig builds webhook URL from siteConfig', async () => {
     process.env.NEXT_PUBLIC_BASE_URL = 'https://site.test'
+    process.env.FREEPIK_API_KEY = 'freepik-key'
+    const { integrationsConfig } = await import('../src/config/integrations')
+    expect(integrationsConfig.freepikApiKey).toBe('freepik-key')
+    expect(integrationsConfig.freepikWebhookUrl).toBe('https://site.test/api/icons/webhook')
+  })
+
+  it('integrationsConfig normalizes trailing slash for webhook URL', async () => {
+    process.env.NEXT_PUBLIC_BASE_URL = 'https://site.test/'
     process.env.FREEPIK_API_KEY = 'freepik-key'
     const { integrationsConfig } = await import('../src/config/integrations')
     expect(integrationsConfig.freepikApiKey).toBe('freepik-key')

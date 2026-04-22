@@ -20,6 +20,7 @@ const spaceGrotesk = Space_Grotesk({
 const metadataTitle = siteConfig.blog.metadata.title
 const resolvedDefaultTitle =
   typeof metadataTitle === 'string' ? metadataTitle : metadataTitle.default
+const ogUrl = new URL('/api/og/site', siteConfig.baseUrl).toString()
 
 export const metadata: Metadata = {
   title: metadataTitle,
@@ -27,11 +28,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: resolvedDefaultTitle,
     description: siteConfig.blog.metadata.description,
-    images: [{ url: `${siteConfig.baseUrl}/api/og/site`, width: 1200, height: 630 }],
+    images: [{ url: ogUrl, width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    images: [`${siteConfig.baseUrl}/api/og/site`],
+    images: [ogUrl],
   },
 }
 

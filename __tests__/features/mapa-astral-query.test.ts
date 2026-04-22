@@ -37,6 +37,22 @@ describe('parseMapaAstralParams', () => {
     expect(parsed.value.hasTime).toBe(false)
   })
 
+  it('uses the first non-empty value when repeated query params arrive as arrays', () => {
+    const parsed = parseMapaAstralParams({
+      data: ['', '1990-03-15'],
+      hora: [' ', '14:30'],
+      lat: ['', '-23.55'],
+      lng: ['-46.63'],
+      cidade: ['', ' São Paulo '],
+    })
+
+    expect(parsed.kind).toBe('valid')
+    if (parsed.kind !== 'valid') return
+    expect(parsed.value.data).toBe('1990-03-15')
+    expect(parsed.value.hora).toBe('14:30')
+    expect(parsed.value.cidade).toBe('São Paulo')
+  })
+
   it('returns validation errors for invalid inputs', () => {
     expect(parseMapaAstralParams({
       data: 'invalido',

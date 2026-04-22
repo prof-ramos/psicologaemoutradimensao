@@ -1,9 +1,9 @@
 export interface MapaAstralRawParams {
-  data?: string
-  hora?: string
-  lat?: string
-  lng?: string
-  cidade?: string
+  data?: string | string[]
+  hora?: string | string[]
+  lat?: string | string[]
+  lng?: string | string[]
+  cidade?: string | string[]
 }
 
 export interface ValidMapaAstralParams {
@@ -31,8 +31,9 @@ const DATE_RE = /^\d{4}-\d{1,2}-\d{1,2}$/
 const TIME_RE = /^\d{1,2}:\d{1,2}$/
 const FLOAT_RE = /^-?\d+(\.\d+)?$/
 
-function normalizeString(value: string | undefined): string | undefined {
-  const trimmed = value?.trim()
+function normalizeString(value: string | string[] | undefined): string | undefined {
+  const raw = Array.isArray(value) ? value.find((item) => item.trim()) : value
+  const trimmed = raw?.trim()
   return trimmed ? trimmed : undefined
 }
 

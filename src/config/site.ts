@@ -17,9 +17,10 @@ interface SiteConfig {
 
 const name = readTrimmedEnv('NEXT_PUBLIC_BLOG_DISPLAY_NAME') || 'PsicologaEmOutraDimensão'
 const defaultDescription = readTrimmedEnv('NEXT_PUBLIC_BLOG_DESCRIPTION') || 'Blog pessoal'
+const baseUrl = (readTrimmedEnv('NEXT_PUBLIC_BASE_URL') || 'http://localhost:3000').replace(/\/+$/, '')
 
 export const siteConfig = {
-  baseUrl: readTrimmedEnv('NEXT_PUBLIC_BASE_URL') || 'http://localhost:3000',
+  baseUrl,
   blog: {
     name,
     metadata: {

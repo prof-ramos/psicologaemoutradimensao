@@ -16,12 +16,16 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 
 interface PageProps {
   searchParams: Promise<{
-    data?:   string   // "1990-03-15"
-    hora?:   string   // "14:30"
-    lat?:    string   // "-23.55"
-    lng?:    string   // "-46.63"
-    cidade?: string   // "São Paulo"
+    data?:   string | string[]   // "1990-03-15"
+    hora?:   string | string[]   // "14:30"
+    lat?:    string | string[]   // "-23.55"
+    lng?:    string | string[]   // "-46.63"
+    cidade?: string | string[]   // "São Paulo"
   }>
+}
+
+function firstQueryValue(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value.find((item) => item.trim()) : value
 }
 
 export default async function MapaAstralPage({ searchParams }: PageProps) {
@@ -71,11 +75,11 @@ export default async function MapaAstralPage({ searchParams }: PageProps) {
               </p>
             </div>
             <ChartForm
-              initialDate={params.data}
-              initialHora={params.hora}
-              initialCidade={params.cidade}
-              initialLat={params.lat}
-              initialLng={params.lng}
+              initialDate={firstQueryValue(params.data)}
+              initialHora={firstQueryValue(params.hora)}
+              initialCidade={firstQueryValue(params.cidade)}
+              initialLat={firstQueryValue(params.lat)}
+              initialLng={firstQueryValue(params.lng)}
             />
           </section>
 

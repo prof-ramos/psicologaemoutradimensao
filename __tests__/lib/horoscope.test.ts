@@ -59,9 +59,12 @@ describe('calculateHoroscope', () => {
 
   it('não expõe corpos celestes fora do conjunto suportado', () => {
     const result = calculateHoroscope(BASE_INPUT)
-    expect(result.positions.some((position) => position.key === 'sirius')).toBe(false)
-    expect(result.aspects.some((aspect) => aspect.planet1 === 'sirius' || aspect.planet2 === 'sirius')).toBe(false)
-    expect(result.planets).not.toHaveProperty('Sirius')
+    expect(result.positions.some((position) => position.key.toLowerCase() === 'sirius')).toBe(false)
+    expect(result.aspects.some((aspect) => (
+      aspect.planet1.toLowerCase() === 'sirius' ||
+      aspect.planet2.toLowerCase() === 'sirius'
+    ))).toBe(false)
+    expect(Object.keys(result.planets).map((key) => key.toLowerCase())).not.toContain('sirius')
   })
 
   it('retorna aspectos com estrutura correta', () => {

@@ -21,5 +21,19 @@ describe('getMapaAstralResult', () => {
     expect(result.ok).toBe(true)
     if (!result.ok) return
     expect(result.result.positions.length).toBeGreaterThan(0)
+    expect(result.result.positions.some((position) => position.namePt === 'Sol')).toBe(true)
+    expect(result.result.positions.some((position) => position.namePt === 'Lua')).toBe(true)
+
+    for (const position of result.result.positions) {
+      expect(position.namePt).toEqual(expect.any(String))
+      expect(position.namePt.length).toBeGreaterThan(0)
+      expect(position.signPt).toEqual(expect.any(String))
+      expect(position.signPt.length).toBeGreaterThan(0)
+      expect(position.decimalDegrees).toBeGreaterThanOrEqual(0)
+      expect(position.decimalDegrees).toBeLessThan(360)
+      expect(Number.isInteger(position.house)).toBe(true)
+      expect(position.house).toBeGreaterThanOrEqual(1)
+      expect(position.house).toBeLessThanOrEqual(12)
+    }
   })
 })

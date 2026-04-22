@@ -23,12 +23,11 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // Permite que scrapers do WhatsApp/Twitter extraiam as OG tags
-        // Next.js marca rotas dinâmicas com Cache-Control: private por padrão,
-        // o que impede scrapers de processar a página.
+        // A página contém dados pessoais via query string; previews públicos
+        // devem usar as rotas OG assinadas em vez de cachear o HTML completo.
         source: '/mapa-astral',
         headers: [
-          { key: 'Cache-Control', value: 'public, max-age=0, must-revalidate' },
+          { key: 'Cache-Control', value: 'private, no-store' },
         ],
       },
     ]

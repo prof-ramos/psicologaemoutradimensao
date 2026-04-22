@@ -58,9 +58,12 @@ export default async function HomePage() {
               </div>
 
               <h1 className="font-heading font-black uppercase leading-[0.88] tracking-tight text-[2.75rem] sm:text-[3.25rem] md:text-[5rem]">
-                Psicóloga<br />
-                Em{' '}
-                <span className="text-shimmer">Outra<br />Dimensão</span>
+                <span className="block">Psicóloga</span>
+                <span className="block sm:inline">Em </span>
+                <span className="text-shimmer block sm:inline-block">
+                  <span className="block sm:inline">Outra</span>{' '}
+                  <span className="block sm:inline">Dimensão</span>
+                </span>
               </h1>
 
               <p className="font-base text-base md:text-lg max-w-sm leading-relaxed text-foreground/80">

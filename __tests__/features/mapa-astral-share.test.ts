@@ -36,8 +36,10 @@ describe('buildMapaAstralShareMessages', () => {
       baseUrl: 'https://example.com/',
     })
 
-    expect(share.url).toContain('https://example.com/mapa-astral?')
-    expect(share.url).toContain('cidade=S%C3%A3o+Paulo')
+    const shareUrl = new URL(share.url)
+    expect(shareUrl.origin).toBe('https://example.com')
+    expect(shareUrl.pathname).toBe('/mapa-astral')
+    expect(shareUrl.searchParams.get('cidade')).toBe('São Paulo')
     expect(share.twitterMessage).toContain('Calculei meu Mapa Astral')
     expect(share.twitterMessage).toContain('https://example.com/mapa-astral?')
     expect(share.whatsappMessage).toContain('Descubra o seu de graça, sem cadastro')

@@ -1,5 +1,10 @@
-import { describe, expect, it } from '@jest/globals'
+/**
+ * @jest-environment node
+ */
+
+import { afterEach, describe, expect, it, jest } from '@jest/globals'
 import { validateGeocodeQuery, MAX_QUERY_LENGTH } from '../../src/lib/geocode-validation'
+import { GET } from '../../src/app/api/geocode/route'
 
 describe('validateGeocodeQuery', () => {
   it('rejeita query vazia', () => {
@@ -44,5 +49,55 @@ describe('validateGeocodeQuery', () => {
 
   it('rejeita undefined como any', () => {
     expect(validateGeocodeQuery(undefined as unknown as string)).toBe(false)
+  })
+})
+
+describe('GET /api/geocode', () => {
+  const originalFetch = global.fetch
+  const originalPhotonApiUrl = process.env.PHOTON_API_URL
+
+  afterEach(() => {
+    global.fetch = originalFetch
+    process.env.PHOTON_API_URL = originalPhotonApiUrl
+  })
+
+  it('uses configured Photon API URL and skips invalid features', async () => {
+    process.env.PHOTON_API_URL = 'https://photon.local/api/'
+    const fetchMock = jest.fn(async (...args: Parameters<typeof fetch>) => {
+      void args
+      return {
+        ok: true,
+        json: async () => ({
+          features: [
+            {
+              geometry: { coordinates: [-46.6333, -23.5505] },
+              properties: { name: 'São Paulo', country: 'Brasil', osm_id: 123 },
+            },
+            {
+              geometry: { coordinates: ['invalid', -23.5505] },
+              properties: { name: 'Entrada quebrada' },
+            },
+            {
+              properties: { name: 'Sem geometria' },
+            },
+          ],
+        }),
+      } as Response
+    })
+    global.fetch = fetchMock as unknown as typeof fetch
+
+    const response = await GET(new Request('https://app.test/api/geocode?q=Sao%20Paulo'))
+    const body = await response.json()
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('https://photon.local/api/?'),
+      expect.any(Object)
+    )
+    expect(body).toEqual([{
+      display_name: 'São Paulo, Brasil',
+      lat: '-23.5505',
+      lon: '-46.6333',
+      place_id: 123,
+    }])
   })
 })
