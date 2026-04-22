@@ -45,7 +45,7 @@ export async function GET(request: Request) {
     const res = await fetch(url.toString(), {
       signal: AbortSignal.timeout(10000),
       headers: {
-        'User-Agent': `PsicologaEmOutraDimensao/1.0 (${process.env.NEXT_PUBLIC_BASE_URL ?? 'psicologaemoutradimensao.vercel.app'})`,
+        'User-Agent': `PsicologaEmOutraDimensao/1.0 (${(process.env.NEXT_PUBLIC_BASE_URL ?? 'psicologaemoutradimensao.vercel.app').trim()})`,
       },
       cache: 'no-store',
     })
@@ -64,8 +64,7 @@ export async function GET(request: Request) {
 
     return Response.json(results)
   } catch (err) {
-    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
-    console.error('geocode fetch error:', msg, { q: trimmed })
-    return Response.json({ error: 'Erro interno', detail: msg }, { status: 500 })
+    console.error('geocode fetch error:', err, { q: trimmed })
+    return Response.json({ error: 'Erro interno' }, { status: 500 })
   }
 }
