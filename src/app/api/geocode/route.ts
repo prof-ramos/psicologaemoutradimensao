@@ -1,12 +1,26 @@
 import { validateGeocodeQuery, MAX_QUERY_LENGTH } from '@/lib/geocode-validation'
 
-interface NominatimResult {
-  display_name: string
-  lat: string
-  lon: string
-  place_id?: string | number
-  osm_id?: string | number
-  [key: string]: unknown
+interface PhotonFeature {
+  geometry: { coordinates: [number, number] }
+  properties: {
+    name?: string
+    city?: string
+    county?: string
+    state?: string
+    country?: string
+    osm_id?: number
+    osm_type?: string
+    type?: string
+  }
+}
+
+interface PhotonResponse {
+  features: PhotonFeature[]
+}
+
+function buildDisplayName(p: PhotonFeature['properties']): string {
+  const parts = [p.name, p.city, p.state, p.country].filter(Boolean)
+  return parts.join(', ')
 }
 
 export async function GET(request: Request) {
@@ -22,18 +36,16 @@ export async function GET(request: Request) {
     )
   }
 
-  const url = new URL('https://nominatim.openstreetmap.org/search')
+  const url = new URL('https://photon.komoot.io/api/')
   url.searchParams.set('q', trimmed)
-  url.searchParams.set('format', 'json')
   url.searchParams.set('limit', '5')
-  url.searchParams.set('addressdetails', '1')
+  url.searchParams.set('lang', 'default')
 
   try {
     const res = await fetch(url.toString(), {
       signal: AbortSignal.timeout(10000),
       headers: {
         'User-Agent': `PsicologaEmOutraDimensao/1.0 (${process.env.NEXT_PUBLIC_BASE_URL ?? 'psicologaemoutradimensao.vercel.app'})`,
-        'Accept-Language': 'pt-BR,pt;q=0.9',
       },
       cache: 'no-store',
     })
@@ -42,8 +54,15 @@ export async function GET(request: Request) {
       return Response.json({ error: 'Serviço de geocoding indisponível' }, { status: 502 })
     }
 
-    const data: NominatimResult[] = await res.json()
-    return Response.json(data)
+    const data: PhotonResponse = await res.json()
+    const results = (data.features ?? []).map((f) => ({
+      display_name: buildDisplayName(f.properties),
+      lat: f.geometry.coordinates[1].toString(),
+      lon: f.geometry.coordinates[0].toString(),
+      place_id: f.properties.osm_id,
+    }))
+
+    return Response.json(results)
   } catch (err) {
     console.error('geocode fetch error:', err, { q: trimmed })
     return Response.json({ error: 'Erro interno' }, { status: 500 })
