@@ -1,6 +1,6 @@
 import { Footer } from '@/components/footer'
 import { Navbar } from '@/components/navbar'
-import { config } from '@/config'
+import { siteConfig } from '@/config/site'
 import type { Metadata } from 'next'
 import { Inter, Space_Grotesk } from 'next/font/google'
 import './globals.css'
@@ -17,29 +17,21 @@ const spaceGrotesk = Space_Grotesk({
   display: 'swap',
 })
 
-const metadataTitle = config.blog.metadata.title
+const metadataTitle = siteConfig.blog.metadata.title
 const resolvedDefaultTitle =
   typeof metadataTitle === 'string' ? metadataTitle : metadataTitle.default
 
 export const metadata: Metadata = {
   title: metadataTitle,
-  description: config.blog.metadata.description,
+  description: siteConfig.blog.metadata.description,
   openGraph: {
     title: resolvedDefaultTitle,
-    description: config.blog.metadata.description,
-    images: [{ url: `${config.baseUrl}/api/og/site`, width: 1200, height: 630 }],
+    description: siteConfig.blog.metadata.description,
+    images: [{ url: `${siteConfig.baseUrl}/api/og/site`, width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    images: [`${config.baseUrl}/api/og/site`],
-  },
-  icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: '256x256', type: 'image/x-icon' },
-      { url: '/icon.png', sizes: '192x192', type: 'image/png' },
-    ],
-    shortcut: [{ url: '/favicon.ico', type: 'image/x-icon' }],
-    apple: [{ url: '/apple-icon.png', sizes: '180x180', type: 'image/png' }],
+    images: [`${siteConfig.baseUrl}/api/og/site`],
   },
 }
 
@@ -53,7 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Pular para o conteúdo
         </a>
-        <Navbar name={config.blog.name} />
+        <Navbar name={siteConfig.blog.name} />
         <main id="main-content" className="flex-1 w-full">
           {children}
         </main>

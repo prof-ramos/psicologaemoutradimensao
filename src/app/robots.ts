@@ -1,9 +1,9 @@
 import type { MetadataRoute } from 'next'
-import { config } from '@/config'
+import { siteConfig } from '@/config/site'
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: { userAgent: '*', allow: '/' },
-    sitemap: `${config.baseUrl}/blog/sitemap.xml`,
+    sitemap: `${siteConfig.baseUrl}/blog/sitemap.xml`,
   }
 }

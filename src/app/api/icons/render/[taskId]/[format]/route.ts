@@ -1,5 +1,6 @@
 import { getRenderUrl } from '@/lib/freepik-icon'
 import { IconFormat } from '@/lib/freepik-icon'
+import { integrationsConfig } from '@/config/integrations'
 
 export async function POST(
   request: Request,
@@ -15,13 +16,19 @@ export async function POST(
     return Response.json({ error: 'Format deve ser png ou svg' }, { status: 400 })
   }
 
+  const apiKey = integrationsConfig.freepikApiKey?.trim()
+  if (!apiKey) {
+    console.error('icons/render error: Freepik API key is not configured')
+    return Response.json({ error: 'FREEPIK_API_KEY não configurada' }, { status: 500 })
+  }
+
   try {
     const renderUrl = getRenderUrl(taskId, format as IconFormat)
 
     const res = await fetch(renderUrl, {
       method: 'POST',
       headers: {
-        'x-api-key': process.env.FREEPIK_API_KEY ?? '',
+        'x-api-key': apiKey,
       },
       signal: AbortSignal.timeout(30000),
     })

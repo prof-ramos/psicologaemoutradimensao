@@ -1,33 +1,16 @@
+/* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from 'next/og'
-import fs from 'fs'
-import path from 'path'
+import { getOgFontOptions, ogAssets } from '@/features/og/assets'
 
 export const runtime = 'nodejs'
-
-function getAssetSrc(file: string, mime: string): string {
-  try {
-    const buf = fs.readFileSync(path.join(process.cwd(), 'public', file))
-    return `data:${mime};base64,${buf.toString('base64')}`
-  } catch {
-    return ''
-  }
-}
 
 const W = 1200
 const H = 630
 const BOTTOM_H = 54
 
 export async function GET() {
-  const mysticSrc = getAssetSrc('mystic.png', 'image/png')
-  let fontData: ArrayBuffer | undefined
-  try {
-    const res = await fetch(
-      'https://fonts.gstatic.com/s/spacegrotesk/v16/V8mQoQDjQSkFtoMM3T6r8E7mF71Q-gowFXDTOA.woff'
-    )
-    if (res.ok) fontData = await res.arrayBuffer()
-  } catch { /* use system font fallback */ }
-
-  const FONT = fontData ? 'SpaceGrotesk' : 'sans-serif'
+  const mysticSrc = ogAssets.mysticSrc
+  const FONT = ogAssets.fontName
   const CONTENT_H = H - BOTTOM_H
 
   try {
@@ -119,7 +102,7 @@ export async function GET() {
               alignSelf: 'stretch',
             }}>
               {mysticSrc
-                ? <img src={mysticSrc} width={260} height={260} style={{ objectFit: 'contain' }} />
+                ? <img src={mysticSrc} alt="" width={260} height={260} style={{ objectFit: 'contain' }} />
                 : <span style={{ fontSize: 140 }}>🔮</span>
               }
             </div>
@@ -149,9 +132,7 @@ export async function GET() {
       {
         width: W,
         height: H,
-        ...(fontData
-          ? { fonts: [{ name: 'SpaceGrotesk', data: fontData, weight: 900, style: 'normal' }] }
-          : {}),
+        ...getOgFontOptions(),
       }
     )
   } catch (e) {

@@ -1,5 +1,4 @@
 import { Badge } from '@/components/ui/badge'
-import { cn } from '@/lib/utils'
 import type { HoroscopeResult } from '@/lib/horoscope'
 import { format, parseISO } from 'date-fns'
 import { ptBR } from 'date-fns/locale'

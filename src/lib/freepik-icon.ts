@@ -1,9 +1,11 @@
+import { integrationsConfig } from '@/config/integrations'
+
 const FREEPIK_BASE_URL = 'https://api.freepik.com/v1/ai/text-to-icon'
 
-export type IconStyle = 'solid' | 'outline' | 'color' | 'flat' | 'sticker'
+type IconStyle = 'solid' | 'outline' | 'color' | 'flat' | 'sticker'
 export type IconFormat = 'png' | 'svg'
 
-export interface GenerateIconParams {
+interface GenerateIconParams {
   prompt: string
   style?: IconStyle
   format?: IconFormat
@@ -11,7 +13,7 @@ export interface GenerateIconParams {
   guidance_scale?: number
 }
 
-export interface GenerateIconResponse {
+interface GenerateIconResponse {
   task_id: string
   status: 'pending' | 'processing' | 'completed' | 'failed'
   result?: {
@@ -21,14 +23,14 @@ export interface GenerateIconResponse {
   error?: string
 }
 
-export interface PreviewIconResponse {
+interface PreviewIconResponse {
   task_id: string
   preview_url: string
 }
 
 function getApiKey(): string {
-  const key = process.env.FREEPIK_API_KEY
-  if (!key) throw new Error('FREEPIK_API_KEY is not set')
+  const key = integrationsConfig.freepikApiKey
+  if (!key) throw new Error('Freepik API key (integrationsConfig.freepikApiKey) is not set')
   return key
 }
 
@@ -49,7 +51,7 @@ export async function generateIcon(params: GenerateIconParams): Promise<Generate
       format: params.format ?? 'png',
       num_inference_steps: params.num_inference_steps ?? 10,
       guidance_scale: params.guidance_scale ?? 7,
-      webhook_url: process.env.NEXT_PUBLIC_BASE_URL + '/api/icons/webhook',
+      webhook_url: integrationsConfig.freepikWebhookUrl,
     }),
     signal: AbortSignal.timeout(30000),
   })

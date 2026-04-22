@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-import { config } from '@/config'
+import { integrationsConfig } from '@/config/integrations'
 import { revalidatePath } from 'next/cache'
 
 function timingSafeCompare(a: string, b: string): boolean {
@@ -17,7 +17,11 @@ export async function POST(request: Request) {
     return new Response('Unauthorized', { status: 401 })
   }
 
-  if (!config.revalidationSecret || !secret || !timingSafeCompare(secret, config.revalidationSecret)) {
+  if (
+    !integrationsConfig.revalidationSecret ||
+    !secret ||
+    !timingSafeCompare(secret, integrationsConfig.revalidationSecret)
+  ) {
     return new Response('Unauthorized', { status: 401 })
   }
 

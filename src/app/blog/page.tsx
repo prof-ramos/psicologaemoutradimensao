@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { wisp } from '@/lib/wisp'
+import { getBlogPostsPage } from '@/features/blog'
 import { BlogPostCard } from '@/components/blog-post-card'
 import { BlogPostsPagination } from '@/components/blog-posts-pagination'
 
@@ -20,15 +20,15 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const page = Number.isInteger(parsed) && parsed >= 1 ? parsed : 1
   const limit = 6
 
-  let posts: Awaited<ReturnType<typeof wisp.getPosts>>['posts'] = []
-  let pagination: Awaited<ReturnType<typeof wisp.getPosts>>['pagination'] = { page: 1, totalPosts: 0, limit: 6, totalPages: 1, nextPage: null, prevPage: null }
+  let posts: Awaited<ReturnType<typeof getBlogPostsPage>>['posts'] = []
+  let pagination: Awaited<ReturnType<typeof getBlogPostsPage>>['pagination'] = { page: 1, totalPosts: 0, limit: 6, totalPages: 1, nextPage: null, prevPage: null }
 
   try {
-    const result = await wisp.getPosts({ limit, page })
+    const result = await getBlogPostsPage(page, limit)
     posts = result.posts
     pagination = result.pagination
   } catch (err) {
-    console.error('wisp.getPosts error:', err)
+    console.error('getBlogPostsPage error:', err)
   }
 
   return (

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-export interface GeoResult {
+interface GeoResult {
   display_name: string
   lat: string
   lon: string

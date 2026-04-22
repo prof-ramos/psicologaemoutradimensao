@@ -1,6 +1,57 @@
 import { Origin, Horoscope } from 'circular-natal-horoscope-js'
 import { PLANET_PT, SIGN_PT, ASPECT_PT, toAstroChartKey } from './horoscope-i18n'
 
+type HoroscopeConstructor = new (input: Record<string, unknown>) => {
+  CelestialBodies: { all: BodyInfo[] }
+  Houses: HouseInfo[]
+  Aspects: { all: AspectDetails[] }
+  Ascendant?: AngleInfo
+  Midheaven?: AngleInfo
+}
+
+type OriginConstructor = new (input: Record<string, unknown>) => unknown
+
+interface BodyInfo {
+  key: string
+  isRetrograde?: boolean
+  House?: { id?: number }
+  Sign: { label: string }
+  ChartPosition: { Ecliptic: { DecimalDegrees: number } }
+}
+
+interface HouseInfo {
+  ChartPosition: { StartPosition: { Ecliptic: { DecimalDegrees: number } } }
+}
+
+interface AspectDetails {
+  point1Key?: string
+  point2Key?: string
+  point1Label?: string
+  point2Label?: string
+  aspectKey?: string
+  label?: string
+  orb: number
+}
+
+interface AngleInfo {
+  Sign: { label: string }
+  ChartPosition: { Ecliptic: { DecimalDegrees: number } }
+}
+
+const SUPPORTED_BODY_KEYS = new Set([
+  'sun',
+  'moon',
+  'mercury',
+  'venus',
+  'mars',
+  'jupiter',
+  'saturn',
+  'uranus',
+  'neptune',
+  'pluto',
+  'chiron',
+])
+
 export type PlanetPosition = {
   key: string           // lowercase body key: "sun", "moon", …
   namePt: string        // "Sol", "Lua", …
@@ -38,7 +89,7 @@ export type HoroscopeResult = {
   midheaven?: AnglePosition
 }
 
-export type HoroscopeInput = {
+type HoroscopeInput = {
   year: number
   month: number   // 1-indexed: January=1, …, December=12
   day: number
@@ -51,7 +102,10 @@ export type HoroscopeInput = {
 
 export function calculateHoroscope(input: HoroscopeInput): HoroscopeResult {
   try {
-  const origin = new (Origin as any)({
+  const OriginClass = Origin as unknown as OriginConstructor
+  const HoroscopeClass = Horoscope as unknown as HoroscopeConstructor
+
+  const origin = new OriginClass({
     year:      input.year,
     month:     input.month - 1,   // Origin usa meses 0-indexed
     date:      input.day,
@@ -61,7 +115,7 @@ export function calculateHoroscope(input: HoroscopeInput): HoroscopeResult {
     longitude: input.lng,
   })
 
-  const horoscope = new (Horoscope as any)({
+  const horoscope = new HoroscopeClass({
     origin,
     houseSystem:      'placidus',
     zodiac:           'tropical',
@@ -82,8 +136,13 @@ export function calculateHoroscope(input: HoroscopeInput): HoroscopeResult {
   const planets: Record<string, number[]> = {}
   const positions: PlanetPosition[] = []
 
-  for (const body of horoscope.CelestialBodies.all as any[]) {
+  for (const body of horoscope.CelestialBodies.all) {
     const key: string = body.key          // "sun", "moon", …
+
+    if (!SUPPORTED_BODY_KEYS.has(key)) {
+      continue
+    }
+
     const dec: number = body.ChartPosition.Ecliptic.DecimalDegrees
     const isRetro: boolean = !!body.isRetrograde
 
@@ -102,26 +161,30 @@ export function calculateHoroscope(input: HoroscopeInput): HoroscopeResult {
 
   // ── Cúspides das casas ────────────────────────────────────────────────
   const cusps: number[] = input.hasTime
-    ? (horoscope.Houses as any[]).map(
-        (h: any) => h.ChartPosition.StartPosition.Ecliptic.DecimalDegrees
-      )
+    ? horoscope.Houses.map((house) => house.ChartPosition.StartPosition.Ecliptic.DecimalDegrees)
     : []
 
   // ── Aspectos ──────────────────────────────────────────────────────────
-  const aspects: AspectInfo[] = (horoscope.Aspects.all as any[]).map((asp: any) => ({
-    planet1: PLANET_PT[asp.point1Key] ?? asp.point1Label,
-    planet2: PLANET_PT[asp.point2Key] ?? asp.point2Label,
-    typePt:  ASPECT_PT[asp.aspectKey] ?? asp.label,
-    orb:     Math.round(asp.orb * 10) / 10,
-  }))
+  const aspects: AspectInfo[] = horoscope.Aspects.all
+    .filter((asp) => {
+      const point1Supported = asp.point1Key ? SUPPORTED_BODY_KEYS.has(asp.point1Key) : true
+      const point2Supported = asp.point2Key ? SUPPORTED_BODY_KEYS.has(asp.point2Key) : true
+      return point1Supported && point2Supported
+    })
+    .map((asp) => ({
+      planet1: (asp.point1Key ? PLANET_PT[asp.point1Key] : undefined) ?? asp.point1Label ?? '—',
+      planet2: (asp.point2Key ? PLANET_PT[asp.point2Key] : undefined) ?? asp.point2Label ?? '—',
+      typePt:  (asp.aspectKey ? ASPECT_PT[asp.aspectKey] : undefined) ?? asp.label ?? '—',
+      orb:     Math.round(asp.orb * 10) / 10,
+    }))
 
   // ── Ascendente e MC ───────────────────────────────────────────────────
   let ascendant: HoroscopeResult['ascendant']
   let midheaven: HoroscopeResult['midheaven']
 
   if (input.hasTime) {
-    const asc = horoscope.Ascendant as any
-    const mc  = horoscope.Midheaven as any
+    const asc = horoscope.Ascendant
+    const mc  = horoscope.Midheaven
 
     if (asc) {
       const deg = asc.ChartPosition.Ecliptic.DecimalDegrees as number

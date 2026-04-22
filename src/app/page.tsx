@@ -1,6 +1,6 @@
 import { BlogPostCard } from '@/components/blog-post-card'
 import { Button } from '@/components/ui/button'
-import { wisp } from '@/lib/wisp'
+import { getRecentBlogPosts } from '@/features/blog'
 import { ArrowRight, Sparkles, Star } from 'lucide-react'
 import Link from 'next/link'
 
@@ -17,12 +17,11 @@ const TICKER_ITEMS = [
 ]
 
 export default async function HomePage() {
-  let posts: Awaited<ReturnType<typeof wisp.getPosts>>['posts'] = []
+  let posts: Awaited<ReturnType<typeof getRecentBlogPosts>> = []
   try {
-    const result = await wisp.getPosts({ limit: 6 })
-    posts = result.posts
+    posts = await getRecentBlogPosts(6)
   } catch (err) {
-    console.error('wisp.getPosts error on HomePage:', err)
+    console.error('getRecentBlogPosts error on HomePage:', err)
   }
 
   return (
@@ -122,7 +121,7 @@ export default async function HomePage() {
                   Regra da casa
                 </p>
                 <p className="font-base text-sm italic text-foreground">
-                  "Se for previsível, reescreve. Se for pasteurizado, corta."
+                  &quot;Se for previsível, reescreve. Se for pasteurizado, corta.&quot;
                 </p>
               </div>
 

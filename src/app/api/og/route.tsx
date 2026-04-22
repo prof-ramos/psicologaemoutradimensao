@@ -1,6 +1,9 @@
-import { calculateHoroscope } from '@/lib/horoscope'
-import { config } from '@/config'
-import crypto from 'crypto'
+import {
+  getMapaAstralResult,
+  parseMapaAstralParams,
+  verifyMapaAstralOgSignature,
+} from '@/features/mapa-astral'
+import { getOgFontOptions, ogAssets } from '@/features/og/assets'
 import { ImageResponse } from 'next/og'
 import { NextRequest } from 'next/server'
 import { format, parseISO } from 'date-fns'
@@ -12,73 +15,41 @@ const W = 1200
 const H = 630
 const BOTTOM_H = 54
 
-function verifySignature(params: URLSearchParams): boolean {
-  const toSign = new URLSearchParams()
-  for (const key of ['data', 'lat', 'lng', 'hora', 'cidade']) {
-    const val = params.get(key)
-    if (val !== null) toSign.set(key, val)
-  }
-  const expected = crypto
-    .createHmac('sha256', config.ogImageSecret)
-    .update(toSign.toString())
-    .digest('hex')
-  const provided = params.get('sig') ?? ''
-  if (provided.length !== expected.length) return false
-  return crypto.timingSafeEqual(Buffer.from(provided, 'hex'), Buffer.from(expected, 'hex'))
-}
-
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
 
-  if (!verifySignature(searchParams)) {
+  if (!verifyMapaAstralOgSignature(searchParams)) {
     return new Response('Unauthorized', { status: 401 })
   }
 
-  const dataStr = searchParams.get('data') ?? ''
-  const lat = parseFloat(searchParams.get('lat') ?? '')
-  const lng = parseFloat(searchParams.get('lng') ?? '')
-  const horaStr = searchParams.get('hora') ?? ''
-  const cidade = searchParams.get('cidade') ?? ''
+  const parsed = parseMapaAstralParams({
+    data: searchParams.get('data') ?? undefined,
+    hora: searchParams.get('hora') ?? undefined,
+    lat: searchParams.get('lat') ?? undefined,
+    lng: searchParams.get('lng') ?? undefined,
+    cidade: searchParams.get('cidade') ?? undefined,
+  })
 
-  if (!dataStr) return new Response('Missing data', { status: 400 })
-  if (!Number.isFinite(lat) || lat < -90  || lat > 90)  return new Response('Invalid lat', { status: 400 })
-  if (!Number.isFinite(lng) || lng < -180 || lng > 180) return new Response('Invalid lng', { status: 400 })
-
-  const [year, month, day] = dataStr.split('-').map(Number)
-  const [hour, minute] = horaStr ? horaStr.split(':').map(Number) : [12, 0]
-
-  if (!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(day))
-    return new Response('Invalid date', { status: 400 })
-  if (horaStr && (!Number.isFinite(hour) || !Number.isFinite(minute)))
-    return new Response('Invalid hora', { status: 400 })
-
-  let result
-  try {
-    result = calculateHoroscope({
-      year, month, day, hour, minute, lat, lng,
-      hasTime: !!horaStr,
-    })
-  } catch {
-    return new Response('Bad request', { status: 400 })
+  if (parsed.kind === 'empty') {
+    return new Response('Missing data', { status: 400 })
   }
+  if (parsed.kind === 'invalid') {
+    return new Response(parsed.error, { status: 400 })
+  }
+
+  const calculation = getMapaAstralResult(parsed.value)
+  if (!calculation.ok) return new Response('Bad request', { status: 400 })
+
+  const { result } = calculation
 
   const sun = result.positions.find(p => p.key === 'sun')
   const moon = result.positions.find(p => p.key === 'moon')
   const asc = result.ascendant
 
-  let formattedDate = dataStr
-  try { formattedDate = format(parseISO(dataStr), 'dd/MM/yyyy', { locale: ptBR }) } catch {}
-  const timeLabel = horaStr ? ` · ${horaStr.replace(':', 'h')}` : ''
-  const locationLine = [cidade, formattedDate + timeLabel].filter(Boolean).join('  ·  ')
-
-  // woff2 is NOT supported by Satori — must use ttf, otf, or woff
-  let fontData: ArrayBuffer | undefined
-  try {
-    const res = await fetch(
-      'https://fonts.gstatic.com/s/spacegrotesk/v16/V8mQoQDjQSkFtoMM3T6r8E7mF71Q-gowFXDTOA.woff'
-    )
-    if (res.ok) fontData = await res.arrayBuffer()
-  } catch { /* use system font fallback */ }
+  let formattedDate = parsed.value.data
+  try { formattedDate = format(parseISO(parsed.value.data), 'dd/MM/yyyy', { locale: ptBR }) } catch {}
+  const timeLabel = parsed.value.hora ? ` · ${parsed.value.hora.replace(':', 'h')}` : ''
+  const locationLine = [parsed.value.cidade, formattedDate + timeLabel].filter(Boolean).join('  ·  ')
 
   const cards = [
     { label: 'SOL', value: sun?.signPt ?? '—', bg: '#4db8ff' },
@@ -86,7 +57,7 @@ export async function GET(req: NextRequest) {
     ...(asc ? [{ label: 'ASCENDENTE', value: asc.signPt, bg: '#ff99cc' }] : []),
   ]
 
-  const FONT = fontData ? 'SpaceGrotesk' : 'sans-serif'
+  const FONT = ogAssets.fontName
   const CONTENT_H = H - BOTTOM_H
 
   try { return new ImageResponse(
@@ -186,9 +157,7 @@ export async function GET(req: NextRequest) {
     {
       width: W,
       height: H,
-      ...(fontData
-        ? { fonts: [{ name: 'SpaceGrotesk', data: fontData, weight: 900, style: 'normal' }] }
-        : {}),
+      ...getOgFontOptions(),
     }
   ) } catch (e) {
     console.error('[og] ImageResponse error:', e)

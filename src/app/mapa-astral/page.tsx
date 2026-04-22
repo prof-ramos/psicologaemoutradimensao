@@ -1,42 +1,17 @@
 import type { Metadata } from 'next'
 import { Globe } from 'lucide-react'
-import { config } from '@/config'
-
-const SITE_OG_IMAGE = { url: `${config.baseUrl}/api/og/site`, width: 1200, height: 630 }
-import { calculateHoroscope } from '@/lib/horoscope'
-import { signMapaAstralOgUrl } from '@/lib/og-image'
+import {
+  buildMapaAstralMetadata,
+  createMapaAstralPageState,
+  parseMapaAstralParams,
+} from '@/features/mapa-astral'
 import { ChartForm } from './chart-form'
 import { ChartDetails } from './chart-details'
 import { ChartSVGWrapper } from './chart-svg-wrapper'
 
-const PAGE_DESCRIPTION = 'Calcule seu mapa natal gratuitamente — 100% open source, em português.'
-
-const BASE_METADATA: Metadata = {
-  title: 'Mapa Astral',
-  description: PAGE_DESCRIPTION,
-  openGraph: { title: 'Mapa Astral', description: PAGE_DESCRIPTION, type: 'website', images: [SITE_OG_IMAGE] },
-  twitter: { card: 'summary_large_image', title: 'Mapa Astral', description: PAGE_DESCRIPTION, images: [SITE_OG_IMAGE.url] },
-}
-
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
-  const params = await searchParams
-  if (!params.data || !params.lat || !params.lng) return BASE_METADATA
-  try {
-    const ogUrl = signMapaAstralOgUrl({
-      data: params.data,
-      lat: params.lat,
-      lng: params.lng,
-      hora: params.hora,
-      cidade: params.cidade,
-    })
-    return {
-      ...BASE_METADATA,
-      openGraph: { ...BASE_METADATA.openGraph, images: [{ url: ogUrl, width: 1200, height: 630 }] },
-      twitter: { ...BASE_METADATA.twitter, images: [ogUrl] },
-    }
-  } catch {
-    return BASE_METADATA
-  }
+  const parsed = parseMapaAstralParams(await searchParams)
+  return buildMapaAstralMetadata(parsed.kind === 'valid' ? parsed.value : undefined)
 }
 
 interface PageProps {
@@ -49,110 +24,10 @@ interface PageProps {
   }>
 }
 
-const DATE_RE = /^\d{4}-\d{1,2}-\d{1,2}$/
-const TIME_RE = /^\d{1,2}:\d{1,2}$/
-
-function validateParams(params: {
-  data?: string; hora?: string; lat?: string; lng?: string
-}): string | null {
-  if (!params.data || !DATE_RE.test(params.data)) return 'Data inválida.'
-  const [year, month, day] = params.data.split('-').map(Number)
-  const parsedDate = new Date(year, month - 1, day)
-  if (
-    !year ||
-    parsedDate.getFullYear() !== year ||
-    parsedDate.getMonth() !== month - 1 ||
-    parsedDate.getDate() !== day
-  ) {
-    return 'Data inválida.'
-  }
-
-  if (params.hora) {
-    if (!TIME_RE.test(params.hora)) return 'Hora inválida.'
-    const [hour, minute] = params.hora.split(':').map(Number)
-    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return 'Hora inválida.'
-  }
-
-  const lat = parseFloat(params.lat ?? '')
-  const lng = parseFloat(params.lng ?? '')
-  if (!Number.isFinite(lat) || lat < -90 || lat > 90) return 'Latitude inválida.'
-  if (!Number.isFinite(lng) || lng < -180 || lng > 180) return 'Longitude inválida.'
-
-  return null
-}
-
 export default async function MapaAstralPage({ searchParams }: PageProps) {
   const params = await searchParams
-  const hasParams = !!(params.data && params.lat && params.lng)
-
-  let result = null
-  let calcError: string | null = null
-
-  if (hasParams) {
-    const validationError = validateParams(params)
-    if (validationError) {
-      calcError = validationError
-    } else {
-      try {
-        const [year, month, day] = params.data!.split('-').map(Number)
-        const [hour, minute] = params.hora
-          ? params.hora.split(':').map(Number)
-          : [12, 0]
-
-        result = calculateHoroscope({
-          year, month, day, hour, minute,
-          lat: parseFloat(params.lat!),
-          lng: parseFloat(params.lng!),
-          hasTime: !!params.hora,
-        })
-      } catch {
-        calcError = 'Não foi possível calcular o mapa. Verifique os dados e tente novamente.'
-      }
-    }
-  }
-
-  let twitterMessage: string | undefined
-  let whatsappMessage: string | undefined
-  if (result && params.data && params.lat && params.lng) {
-    const qs = new URLSearchParams({ data: params.data, lat: params.lat, lng: params.lng })
-    if (params.hora) qs.set('hora', params.hora)
-    if (params.cidade) qs.set('cidade', params.cidade)
-    const url = `${config.baseUrl}/mapa-astral?${qs.toString()}`
-
-    const sun = result.positions.find(p => p.key === 'sun')
-    const moon = result.positions.find(p => p.key === 'moon')
-    const asc = result.ascendant
-
-    const twitterParts: string[] = []
-    if (sun) twitterParts.push(`Sol em ${sun.signPt}`)
-    if (asc) twitterParts.push(`Asc em ${asc.signPt}`)
-    if (moon) twitterParts.push(`Lua em ${moon.signPt}`)
-    twitterMessage = [
-      `Calculei meu Mapa Astral 🔮`,
-      twitterParts.join(' · '),
-      ``,
-      `Descubra o seu de graça 👇`,
-      url,
-      ``,
-      `por @Gayaliz_`,
-    ].join('\n')
-
-    const waParts: string[] = []
-    if (sun) waParts.push(`Sol em ${sun.signPt}`)
-    if (asc) waParts.push(`Ascendente em ${asc.signPt}`)
-    if (moon) waParts.push(`Lua em ${moon.signPt}`)
-    const waBody = waParts.length
-      ? ` — ${waParts.slice(0, -1).join(', ')}${waParts.length > 1 ? ` e ${waParts.at(-1)}` : waParts[0]}`
-      : ''
-    whatsappMessage = [
-      `Calculei meu Mapa Astral 🔮${waBody}.`,
-      ``,
-      `Descubra o seu de graça, sem cadastro 👇`,
-      url,
-      ``,
-      `por @Gayaliz_`,
-    ].join('\n')
-  }
+  const pageState = createMapaAstralPageState(params)
+  const { calcError, params: parsedParams, result, shareMessages } = pageState
 
   return (
     <main className="-mx-4 -mt-8 flex flex-col">
@@ -227,11 +102,11 @@ export default async function MapaAstralPage({ searchParams }: PageProps) {
                 </div>
                 <ChartDetails
                   data={result}
-                  cidade={params.cidade ?? ''}
-                  dataStr={params.data!}
-                  hora={params.hora}
-                  twitterMessage={twitterMessage}
-                  whatsappMessage={whatsappMessage}
+                  cidade={parsedParams?.cidade ?? ''}
+                  dataStr={parsedParams?.data ?? ''}
+                  hora={parsedParams?.hora}
+                  twitterMessage={shareMessages?.twitterMessage}
+                  whatsappMessage={shareMessages?.whatsappMessage}
                 />
               </div>
             </section>
