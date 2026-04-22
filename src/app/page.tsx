@@ -1,6 +1,6 @@
 import { BlogPostCard } from '@/components/blog-post-card'
 import { Button } from '@/components/ui/button'
-import { wisp } from '@/lib/wisp'
+import { getRecentBlogPosts } from '@/features/blog'
 import { ArrowRight, Sparkles, Star } from 'lucide-react'
 import Link from 'next/link'
 
@@ -17,12 +17,11 @@ const TICKER_ITEMS = [
 ]
 
 export default async function HomePage() {
-  let posts: Awaited<ReturnType<typeof wisp.getPosts>>['posts'] = []
+  let posts: Awaited<ReturnType<typeof getRecentBlogPosts>> = []
   try {
-    const result = await wisp.getPosts({ limit: 6 })
-    posts = result.posts
+    posts = await getRecentBlogPosts(6)
   } catch (err) {
-    console.error('wisp.getPosts error on HomePage:', err)
+    console.error('getRecentBlogPosts error on HomePage:', err)
   }
 
   return (
@@ -58,13 +57,13 @@ export default async function HomePage() {
                 </span>
               </div>
 
-              <h1 className="font-heading font-black uppercase leading-[0.88] tracking-tight text-[3.25rem] md:text-[5rem]">
-                Psicóloga<br />
-                Em{' '}
-                <span className="inline-block border-2 border-border bg-vibrant-pink px-2 leading-tight">
-                  Outra
-                </span>{' '}
-                Dimensão
+              <h1 className="font-heading font-black uppercase leading-[0.88] tracking-tight text-[2.75rem] sm:text-[3.25rem] md:text-[5rem]">
+                <span className="block">Psicóloga</span>
+                <span className="block sm:inline">Em </span>
+                <span className="text-shimmer block sm:inline-block">
+                  <span className="block sm:inline">Outra</span>{' '}
+                  <span className="block sm:inline">Dimensão</span>
+                </span>
               </h1>
 
               <p className="font-base text-base md:text-lg max-w-sm leading-relaxed text-foreground/80">
@@ -125,7 +124,7 @@ export default async function HomePage() {
                   Regra da casa
                 </p>
                 <p className="font-base text-sm italic text-foreground">
-                  "Se for previsível, reescreve. Se for pasteurizado, corta."
+                  &quot;Se for previsível, reescreve. Se for pasteurizado, corta.&quot;
                 </p>
               </div>
 

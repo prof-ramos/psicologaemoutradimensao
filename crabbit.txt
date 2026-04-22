@@ -1,0 +1,6 @@
+Starting CodeRabbit review in plain text mode...
+
+Review directory: /Users/gabrielramos/psicologaemoutradimensao
+
+Connecting to review service
+Setting up

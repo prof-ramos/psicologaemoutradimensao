@@ -1,10 +1,10 @@
-import { config } from '@/config'
-import { wisp } from '@/lib/wisp'
+import { siteConfig } from '@/config/site'
+import { getAllBlogPosts } from '@/features/blog'
 import type { MetadataRoute } from 'next'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
-    const { posts } = await wisp.getPosts({ limit: 'all' })
+    const posts = await getAllBlogPosts()
 
     const latestDate = posts.reduce((max, post) => {
       if (!post.publishedAt) return max
@@ -15,14 +15,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const blogLastModified = latestDate.getTime() > 0 ? latestDate : new Date()
 
     return [
-      { url: `${config.baseUrl}/blog/`, lastModified: blogLastModified },
+      { url: `${siteConfig.baseUrl}/blog/`, lastModified: blogLastModified },
       ...posts.map((post) => ({
-        url: `${config.baseUrl}/blog/${post.slug}`,
+        url: `${siteConfig.baseUrl}/blog/${post.slug}`,
         lastModified: post.publishedAt ? new Date(post.publishedAt) : blogLastModified,
       })),
     ]
   } catch (err) {
     console.error('sitemap generation error:', err)
-    return [{ url: `${config.baseUrl}/blog/`, lastModified: new Date() }]
+    return [{ url: `${siteConfig.baseUrl}/blog/`, lastModified: new Date() }]
   }
 }

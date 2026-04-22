@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { wisp } from '@/lib/wisp'
+import { getBlogPostsPage } from '@/features/blog'
 import { BlogPostCard } from '@/components/blog-post-card'
 import { BlogPostsPagination } from '@/components/blog-posts-pagination'
 
@@ -20,15 +20,17 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const page = Number.isInteger(parsed) && parsed >= 1 ? parsed : 1
   const limit = 6
 
-  let posts: Awaited<ReturnType<typeof wisp.getPosts>>['posts'] = []
-  let pagination: Awaited<ReturnType<typeof wisp.getPosts>>['pagination'] = { page: 1, totalPosts: 0, limit: 6 }
+  let posts: Awaited<ReturnType<typeof getBlogPostsPage>>['posts'] = []
+  let pagination: Awaited<ReturnType<typeof getBlogPostsPage>>['pagination'] = { page: 1, totalPosts: 0, limit: 6, totalPages: 1, nextPage: null, prevPage: null }
+  let fetchError = false
 
   try {
-    const result = await wisp.getPosts({ limit, page })
+    const result = await getBlogPostsPage(page, limit)
     posts = result.posts
     pagination = result.pagination
   } catch (err) {
-    console.error('wisp.getPosts error:', err)
+    fetchError = true
+    console.error('getBlogPostsPage error:', err)
   }
 
   return (
@@ -46,10 +48,17 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
             pagination={{
               page: pagination.page,
               totalPosts: pagination.totalPosts,
-              limit: pagination.limit ?? limit,
+              limit: typeof pagination.limit === 'number' ? pagination.limit : limit,
             }}
           />
         </>
+      ) : fetchError ? (
+        <div className="border-2 border-border bg-vibrant-pink p-4 shadow-shadow">
+          <p className="font-heading text-lg font-black uppercase">Não foi possível carregar os posts.</p>
+          <p className="mt-2 font-base text-sm text-foreground/80">
+            Tente novamente em instantes. O conteúdo pode estar temporariamente indisponível.
+          </p>
+        </div>
       ) : (
         <p className="font-base text-muted-foreground">Nenhum post ainda.</p>
       )}

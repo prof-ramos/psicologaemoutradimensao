@@ -8,13 +8,9 @@ jest.mock('next/cache', () => ({
   revalidatePath: (...args: unknown[]) => mockRevalidatePath(...args),
 }))
 
-jest.mock('../../src/config', () => ({
-  config: {
+jest.mock('../../src/config/integrations', () => ({
+  integrationsConfig: {
     revalidationSecret: 'test-secret-value',
-    baseUrl: 'http://localhost:3000',
-    blog: { name: 'Test', metadata: { title: { default: 'Test', absolute: 'Test', template: '%s | Test' }, description: 'Test' } },
-    ogImageSecret: 'test-og-secret',
-    wisp: { blogId: 'test-blog-id' },
   },
 }))
 

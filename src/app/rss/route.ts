@@ -1,5 +1,5 @@
-import { config } from '@/config'
-import { wisp } from '@/lib/wisp'
+import { getRecentBlogPosts } from '@/features/blog'
+import { siteConfig } from '@/config/site'
 import RSS from 'rss'
 
 export const revalidate = 3600
@@ -7,10 +7,9 @@ export const revalidate = 3600
 export async function GET() {
   let posts
   try {
-    const result = await wisp.getPosts({ limit: 20 })
-    posts = result.posts
+    posts = await getRecentBlogPosts(20)
   } catch (err) {
-    console.error('wisp.getPosts error:', err)
+    console.error('getRecentBlogPosts error:', err)
     return new Response(JSON.stringify({ error: 'Failed to fetch posts' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
@@ -18,10 +17,10 @@ export async function GET() {
   }
 
   const feed = new RSS({
-    title: config.blog.name,
-    description: config.blog.metadata.description,
-    feed_url: `${config.baseUrl}/rss`,
-    site_url: config.baseUrl,
+    title: siteConfig.blog.name,
+    description: siteConfig.blog.metadata.description,
+    feed_url: `${siteConfig.baseUrl}/rss`,
+    site_url: siteConfig.baseUrl,
     language: 'pt-BR',
   })
 
@@ -30,7 +29,7 @@ export async function GET() {
     feed.item({
       title: post.title,
       description: post.description ?? '',
-      url: `${config.baseUrl}/blog/${post.slug}`,
+      url: `${siteConfig.baseUrl}/blog/${post.slug}`,
       date: new Date(post.publishedAt),
     })
   }
