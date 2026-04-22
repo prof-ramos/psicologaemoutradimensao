@@ -7,7 +7,6 @@ describe('domain configs', () => {
     delete process.env.NEXT_PUBLIC_BLOG_DISPLAY_NAME
     delete process.env.NEXT_PUBLIC_BLOG_DESCRIPTION
     delete process.env.NEXT_PUBLIC_BASE_URL
-    delete process.env.FREEPIK_API_KEY
     delete process.env.OG_IMAGE_SECRET
     delete process.env.REVALIDATION_SECRET
     jest.resetModules()
@@ -31,19 +30,9 @@ describe('domain configs', () => {
     expect(cmsConfig.blogId).toBeUndefined()
   })
 
-  it('integrationsConfig builds webhook URL from siteConfig', async () => {
-    process.env.NEXT_PUBLIC_BASE_URL = 'https://site.test'
-    process.env.FREEPIK_API_KEY = 'freepik-key'
+  it('integrationsConfig reads optional revalidation secret', async () => {
+    process.env.REVALIDATION_SECRET = ' revalidation-secret '
     const { integrationsConfig } = await import('../src/config/integrations')
-    expect(integrationsConfig.freepikApiKey).toBe('freepik-key')
-    expect(integrationsConfig.freepikWebhookUrl).toBe('https://site.test/api/icons/webhook')
-  })
-
-  it('integrationsConfig normalizes trailing slash for webhook URL', async () => {
-    process.env.NEXT_PUBLIC_BASE_URL = 'https://site.test/'
-    process.env.FREEPIK_API_KEY = 'freepik-key'
-    const { integrationsConfig } = await import('../src/config/integrations')
-    expect(integrationsConfig.freepikApiKey).toBe('freepik-key')
-    expect(integrationsConfig.freepikWebhookUrl).toBe('https://site.test/api/icons/webhook')
+    expect(integrationsConfig.revalidationSecret).toBe('revalidation-secret')
   })
 })

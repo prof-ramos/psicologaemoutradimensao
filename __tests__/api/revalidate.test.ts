@@ -11,8 +11,6 @@ jest.mock('next/cache', () => ({
 jest.mock('../../src/config/integrations', () => ({
   integrationsConfig: {
     revalidationSecret: 'test-secret-value',
-    freepikApiKey: 'freepik-key',
-    freepikWebhookUrl: 'http://localhost:3000/api/icons/webhook',
   },
 }))
 
