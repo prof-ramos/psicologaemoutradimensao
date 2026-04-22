@@ -21,7 +21,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const limit = 6
 
   let posts: Awaited<ReturnType<typeof wisp.getPosts>>['posts'] = []
-  let pagination: Awaited<ReturnType<typeof wisp.getPosts>>['pagination'] = { page: 1, totalPosts: 0, limit: 6 }
+  let pagination: Awaited<ReturnType<typeof wisp.getPosts>>['pagination'] = { page: 1, totalPosts: 0, limit: 6, totalPages: 1, nextPage: null, prevPage: null }
 
   try {
     const result = await wisp.getPosts({ limit, page })
@@ -46,7 +46,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
             pagination={{
               page: pagination.page,
               totalPosts: pagination.totalPosts,
-              limit: pagination.limit ?? limit,
+              limit: typeof pagination.limit === 'number' ? pagination.limit : limit,
             }}
           />
         </>
