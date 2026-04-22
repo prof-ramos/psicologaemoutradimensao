@@ -83,17 +83,3 @@ reviews:
 
 chat:
   auto_reply: true
-
-tools:
-  markdownlint:
-    enabled: true
-  yamllint:
-    enabled: true
-  gitleaks:
-    enabled: true
-  dotenvLint:
-    enabled: true
-  htmlhint:
-    enabled: false
-  eslint:
-    enabled: false

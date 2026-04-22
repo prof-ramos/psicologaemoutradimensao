@@ -10,10 +10,10 @@ const mockGetPosts = jest.fn()
 const mockGetPost = jest.fn()
 
 jest.mock('../../src/features/blog/client', () => ({
-  wisp: {
+  getWispClient: () => ({
     getPosts: (...args: unknown[]) => mockGetPosts(...args),
     getPost: (...args: unknown[]) => mockGetPost(...args),
-  },
+  }),
 }))
 
 describe('blog service', () => {

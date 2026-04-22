@@ -24,10 +24,11 @@ describe('domain configs', () => {
     expect(siteConfig.blog.name).toBe('PsicologaEmOutraDimensão')
   })
 
-  it('cmsConfig requires blog id', async () => {
+  it('cmsConfig allows missing blog id so previews can build without CMS access', async () => {
     delete process.env.NEXT_PUBLIC_BLOG_ID
     jest.resetModules()
-    await expect(import('../src/config/cms')).rejects.toThrow('NEXT_PUBLIC_BLOG_ID is missing')
+    const { cmsConfig } = await import('../src/config/cms')
+    expect(cmsConfig.blogId).toBeUndefined()
   })
 
   it('integrationsConfig builds webhook URL from siteConfig', async () => {

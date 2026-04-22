@@ -18,7 +18,7 @@ export interface AppConfig {
   }
   ogImageSecret?: string
   revalidationSecret?: string
-  wisp: { blogId: string }
+  wisp: { blogId?: string }
 }
 
 export const config: AppConfig = {

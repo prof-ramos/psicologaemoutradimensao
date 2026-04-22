@@ -9,10 +9,11 @@ describe('config', () => {
     process.env = { ...originalEnv }
   })
 
-  it('throws when NEXT_PUBLIC_BLOG_ID is missing', async () => {
+  it('allows missing NEXT_PUBLIC_BLOG_ID so previews can build without CMS access', async () => {
     delete process.env.NEXT_PUBLIC_BLOG_ID
     jest.resetModules()
-    await expect(import('../src/config')).rejects.toThrow('NEXT_PUBLIC_BLOG_ID is missing')
+    const { config } = await import('../src/config')
+    expect(config.wisp.blogId).toBeUndefined()
   })
 
   async function loadConfig() {

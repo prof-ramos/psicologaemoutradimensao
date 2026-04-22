@@ -1,5 +1,5 @@
-import { requireTrimmedEnv } from './shared'
+import { readTrimmedEnv } from './shared'
 
 export const cmsConfig = {
-  blogId: requireTrimmedEnv('NEXT_PUBLIC_BLOG_ID'),
+  blogId: readTrimmedEnv('NEXT_PUBLIC_BLOG_ID'),
 }
