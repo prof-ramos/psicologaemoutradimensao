@@ -64,7 +64,8 @@ export async function GET(request: Request) {
 
     return Response.json(results)
   } catch (err) {
-    console.error('geocode fetch error:', err, { q: trimmed })
-    return Response.json({ error: 'Erro interno' }, { status: 500 })
+    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
+    console.error('geocode fetch error:', msg, { q: trimmed })
+    return Response.json({ error: 'Erro interno', detail: msg }, { status: 500 })
   }
 }
