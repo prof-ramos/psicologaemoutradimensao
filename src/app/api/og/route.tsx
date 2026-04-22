@@ -187,7 +187,7 @@ export async function GET(req: NextRequest) {
       width: W,
       height: H,
       ...(fontData
-        ? { fonts: [{ name: 'SpaceGrotesk', data: fontData, weight: 700, style: 'normal' }] }
+        ? { fonts: [{ name: 'SpaceGrotesk', data: fontData, weight: 900, style: 'normal' }] }
         : {}),
     }
   ) } catch (e) {

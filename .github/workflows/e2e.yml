@@ -1,0 +1,43 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+        env:
+          NEXT_PUBLIC_BLOG_ID: ${{ secrets.NEXT_PUBLIC_BLOG_ID }}
+          NEXT_PUBLIC_BASE_URL: http://localhost:3000
+          OG_IMAGE_SECRET: ${{ secrets.OG_IMAGE_SECRET }}
+          REVALIDATION_SECRET: ${{ secrets.REVALIDATION_SECRET }}
+          NEXT_PUBLIC_BLOG_DISPLAY_NAME: PsicologaEmOutraDimensão
+          NEXT_PUBLIC_BLOG_DESCRIPTION: Blog pessoal
+
+      - name: Upload test artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

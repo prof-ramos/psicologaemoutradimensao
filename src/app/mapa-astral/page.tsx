@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Globe } from 'lucide-react'
 import { config } from '@/config'
+
+const SITE_OG_IMAGE = { url: `${config.baseUrl}/api/og/site`, width: 1200, height: 630 }
 import { calculateHoroscope } from '@/lib/horoscope'
 import { signMapaAstralOgUrl } from '@/lib/og-image'
 import { ChartForm } from './chart-form'
@@ -12,8 +14,8 @@ const PAGE_DESCRIPTION = 'Calcule seu mapa natal gratuitamente — 100% open sou
 const BASE_METADATA: Metadata = {
   title: 'Mapa Astral',
   description: PAGE_DESCRIPTION,
-  openGraph: { title: 'Mapa Astral', description: PAGE_DESCRIPTION, type: 'website' },
-  twitter: { card: 'summary_large_image', title: 'Mapa Astral', description: PAGE_DESCRIPTION },
+  openGraph: { title: 'Mapa Astral', description: PAGE_DESCRIPTION, type: 'website', images: [SITE_OG_IMAGE] },
+  twitter: { card: 'summary_large_image', title: 'Mapa Astral', description: PAGE_DESCRIPTION, images: [SITE_OG_IMAGE.url] },
 }
 
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {

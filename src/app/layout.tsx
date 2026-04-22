@@ -27,6 +27,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: resolvedDefaultTitle,
     description: config.blog.metadata.description,
+    images: [{ url: `${config.baseUrl}/api/og/site`, width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: [`${config.baseUrl}/api/og/site`],
   },
   icons: {
     icon: [
