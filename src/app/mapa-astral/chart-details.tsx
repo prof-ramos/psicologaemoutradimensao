@@ -130,8 +130,8 @@ export function ChartDetails({ data, cidade, dataStr, hora, twitterMessage, what
           <div className="h-0.5 flex-1 bg-border" />
         </div>
         
-        <div className="overflow-hidden border-2 border-border bg-background shadow-shadow">
-          <table className="w-full font-base text-sm">
+        <div className="overflow-x-auto border-2 border-border bg-background shadow-shadow">
+          <table className="w-full min-w-[340px] font-base text-sm">
             <thead>
               <tr className="border-b-2 border-border bg-secondary-background">
                 <th scope="col" className="px-4 py-3 text-left font-heading text-xs font-black uppercase tracking-widest">

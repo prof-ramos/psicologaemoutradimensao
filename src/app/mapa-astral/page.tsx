@@ -220,7 +220,7 @@ export default async function MapaAstralPage({ searchParams }: PageProps) {
               </div>
               
               <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-start">
-                <div className="sticky top-24">
+                <div className="lg:sticky lg:top-24">
                   <ChartSVGWrapper data={result} />
                 </div>
                 <ChartDetails

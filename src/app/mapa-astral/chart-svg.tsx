@@ -71,7 +71,7 @@ export function ChartSVG({ data }: ChartSVGProps) {
     <figure className="space-y-4">
       <div className="relative group">
         {/* Decorativo: Moldura externa neobrutalist */}
-        <div className="absolute -inset-2 bg-main border-2 border-border -z-10 translate-x-1 translate-y-1 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform" />
+        <div className="absolute inset-0 bg-main border-2 border-border -z-10 translate-x-2 translate-y-2 group-hover:translate-x-3 group-hover:translate-y-3 transition-transform" />
         
         <div className="border-2 border-border shadow-shadow w-full aspect-square bg-white overflow-hidden">
           <div
