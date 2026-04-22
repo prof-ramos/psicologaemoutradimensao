@@ -61,10 +61,7 @@ export default async function HomePage() {
               <h1 className="font-heading font-black uppercase leading-[0.88] tracking-tight text-[3.25rem] md:text-[5rem]">
                 Psicóloga<br />
                 Em{' '}
-                <span className="inline-block border-2 border-border bg-vibrant-pink px-2 leading-tight">
-                  Outra
-                </span>{' '}
-                Dimensão
+                <span className="text-shimmer">Outra<br />Dimensão</span>
               </h1>
 
               <p className="font-base text-base md:text-lg max-w-sm leading-relaxed text-foreground/80">

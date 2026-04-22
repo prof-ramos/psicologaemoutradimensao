@@ -1,5 +1,3 @@
-import crypto from 'crypto'
-
 export interface AppConfig {
   baseUrl: string
   blog: {
@@ -23,7 +21,8 @@ const buildConfig = (): AppConfig => {
   if (!blogId) throw new Error('NEXT_PUBLIC_BLOG_ID is missing')
 
   const isProduction = process.env.NODE_ENV === 'production'
-  const fallbackSecret = () => crypto.randomBytes(32).toString('hex')
+  // Fallback aleatório para dev — nunca estático. Use env var em CI/remote dev.
+  const devFallback = require('crypto').randomBytes(32).toString('hex')
 
   const ogImageSecret = process.env.OG_IMAGE_SECRET
   if (isProduction && !ogImageSecret) {
@@ -51,8 +50,8 @@ const buildConfig = (): AppConfig => {
         description: defaultDescription,
       },
     },
-    ogImageSecret: ogImageSecret || fallbackSecret(),
-    revalidationSecret: revalidationSecret || fallbackSecret(),
+    ogImageSecret: ogImageSecret || devFallback,
+    revalidationSecret: revalidationSecret || devFallback,
     wisp: { blogId },
   }
 }

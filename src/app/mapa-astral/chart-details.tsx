@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils'
 import type { HoroscopeResult } from '@/lib/horoscope'
 import { format, parseISO } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { MessageCircle, X } from 'lucide-react'
 
 const ASPECT_VARIANTS = ['default', 'blue', 'pink', 'orange'] as const
 
@@ -11,9 +12,11 @@ interface ChartDetailsProps {
   cidade: string
   dataStr: string   // "1990-03-15"
   hora?: string     // "14:30" ou undefined
+  twitterMessage?: string
+  whatsappMessage?: string
 }
 
-export function ChartDetails({ data, cidade, dataStr, hora }: ChartDetailsProps) {
+export function ChartDetails({ data, cidade, dataStr, hora, twitterMessage, whatsappMessage }: ChartDetailsProps) {
   let formattedDate = '—'
   try {
     formattedDate = format(parseISO(dataStr), 'dd/MM/yyyy', { locale: ptBR })
@@ -50,22 +53,40 @@ export function ChartDetails({ data, cidade, dataStr, hora }: ChartDetailsProps)
           {data.hasHouses && (data.ascendant || data.midheaven) && (
             <div className="grid grid-cols-2 gap-3 pt-2">
               {data.ascendant && (
-                <div className="border-2 border-border bg-cosmic-blue p-3 shadow-shadow">
-                  <p className="font-heading text-[10px] font-black uppercase tracking-wider">
+                <div className="relative overflow-hidden border-2 border-border bg-cosmic-blue p-4 shadow-shadow">
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -right-1 -bottom-2 font-heading text-8xl font-black leading-none text-black/10 select-none"
+                  >
+                    {Math.floor(data.ascendant.degreeInSign)}°
+                  </span>
+                  <p className="font-heading text-[9px] font-black uppercase tracking-[0.18em] text-black/50">
                     Ascendente
                   </p>
-                  <p className="font-base text-sm font-black truncate">
-                    {data.ascendant.signPt} {Math.floor(data.ascendant.degreeInSign)}°
+                  <p className="font-heading text-xl font-black uppercase leading-tight mt-1">
+                    {data.ascendant.signPt}
+                  </p>
+                  <p className="font-base text-xs font-bold text-black/60 mt-0.5">
+                    {Math.floor(data.ascendant.degreeInSign)}° no signo
                   </p>
                 </div>
               )}
               {data.midheaven && (
-                <div className="border-2 border-border bg-vibrant-pink p-3 shadow-shadow">
-                  <p className="font-heading text-[10px] font-black uppercase tracking-wider">
+                <div className="relative overflow-hidden border-2 border-border bg-vibrant-pink p-4 shadow-shadow">
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -right-1 -bottom-2 font-heading text-8xl font-black leading-none text-black/10 select-none"
+                  >
+                    {Math.floor(data.midheaven.degreeInSign)}°
+                  </span>
+                  <p className="font-heading text-[9px] font-black uppercase tracking-[0.18em] text-black/50">
                     Meio do Céu
                   </p>
-                  <p className="font-base text-sm font-black truncate">
-                    {data.midheaven.signPt} {Math.floor(data.midheaven.degreeInSign)}°
+                  <p className="font-heading text-xl font-black uppercase leading-tight mt-1">
+                    {data.midheaven.signPt}
+                  </p>
+                  <p className="font-base text-xs font-bold text-black/60 mt-0.5">
+                    {Math.floor(data.midheaven.degreeInSign)}° no signo
                   </p>
                 </div>
               )}
@@ -73,6 +94,34 @@ export function ChartDetails({ data, cidade, dataStr, hora }: ChartDetailsProps)
           )}
         </div>
       </div>
+
+      {/* Compartilhar */}
+      {(twitterMessage || whatsappMessage) && (
+        <div className="flex flex-wrap gap-3">
+          {twitterMessage && (
+            <a
+              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterMessage)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 h-9 px-3 text-xs rounded-base font-heading font-bold border-2 border-border bg-background text-foreground shadow-shadow hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none transition-all duration-200"
+            >
+              <X className="h-3.5 w-3.5" />
+              Twitter
+            </a>
+          )}
+          {whatsappMessage && (
+            <a
+              href={`https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappMessage)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 h-9 px-3 text-xs rounded-base font-heading font-bold border-2 border-border bg-main text-main-foreground shadow-shadow hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none transition-all duration-200"
+            >
+              <MessageCircle className="h-3.5 w-3.5" />
+              WhatsApp
+            </a>
+          )}
+        </div>
+      )}
 
       {/* Tabela de Posições */}
       <div className="space-y-4">

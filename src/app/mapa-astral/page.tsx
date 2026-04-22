@@ -1,13 +1,40 @@
 import type { Metadata } from 'next'
 import { Globe } from 'lucide-react'
+import { config } from '@/config'
 import { calculateHoroscope } from '@/lib/horoscope'
+import { signMapaAstralOgUrl } from '@/lib/og-image'
 import { ChartForm } from './chart-form'
 import { ChartDetails } from './chart-details'
 import { ChartSVGWrapper } from './chart-svg-wrapper'
 
-export const metadata: Metadata = {
+const PAGE_DESCRIPTION = 'Calcule seu mapa natal gratuitamente — 100% open source, em português.'
+
+const BASE_METADATA: Metadata = {
   title: 'Mapa Astral',
-  description: 'Calcule seu mapa natal gratuitamente — 100% open source, em português.',
+  description: PAGE_DESCRIPTION,
+  openGraph: { title: 'Mapa Astral', description: PAGE_DESCRIPTION, type: 'website' },
+  twitter: { card: 'summary_large_image', title: 'Mapa Astral', description: PAGE_DESCRIPTION },
+}
+
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const params = await searchParams
+  if (!params.data || !params.lat || !params.lng) return BASE_METADATA
+  try {
+    const ogUrl = signMapaAstralOgUrl({
+      data: params.data,
+      lat: params.lat,
+      lng: params.lng,
+      hora: params.hora,
+      cidade: params.cidade,
+    })
+    return {
+      ...BASE_METADATA,
+      openGraph: { ...BASE_METADATA.openGraph, images: [{ url: ogUrl, width: 1200, height: 630 }] },
+      twitter: { ...BASE_METADATA.twitter, images: [ogUrl] },
+    }
+  } catch {
+    return BASE_METADATA
+  }
 }
 
 interface PageProps {
@@ -82,10 +109,53 @@ export default async function MapaAstralPage({ searchParams }: PageProps) {
     }
   }
 
+  let twitterMessage: string | undefined
+  let whatsappMessage: string | undefined
+  if (result && params.data && params.lat && params.lng) {
+    const qs = new URLSearchParams({ data: params.data, lat: params.lat, lng: params.lng })
+    if (params.hora) qs.set('hora', params.hora)
+    if (params.cidade) qs.set('cidade', params.cidade)
+    const url = `${config.baseUrl}/mapa-astral?${qs.toString()}`
+
+    const sun = result.positions.find(p => p.key === 'sun')
+    const moon = result.positions.find(p => p.key === 'moon')
+    const asc = result.ascendant
+
+    const twitterParts: string[] = []
+    if (sun) twitterParts.push(`Sol em ${sun.signPt}`)
+    if (asc) twitterParts.push(`Asc em ${asc.signPt}`)
+    if (moon) twitterParts.push(`Lua em ${moon.signPt}`)
+    twitterMessage = [
+      `Calculei meu Mapa Astral 🔮`,
+      twitterParts.join(' · '),
+      ``,
+      `Descubra o seu de graça 👇`,
+      url,
+      ``,
+      `por @Gayaliz_`,
+    ].join('\n')
+
+    const waParts: string[] = []
+    if (sun) waParts.push(`Sol em ${sun.signPt}`)
+    if (asc) waParts.push(`Ascendente em ${asc.signPt}`)
+    if (moon) waParts.push(`Lua em ${moon.signPt}`)
+    const waBody = waParts.length
+      ? ` — ${waParts.slice(0, -1).join(', ')}${waParts.length > 1 ? ` e ${waParts.at(-1)}` : waParts[0]}`
+      : ''
+    whatsappMessage = [
+      `Calculei meu Mapa Astral 🔮${waBody}.`,
+      ``,
+      `Descubra o seu de graça, sem cadastro 👇`,
+      url,
+      ``,
+      `por @Gayaliz_`,
+    ].join('\n')
+  }
+
   return (
     <main className="-mx-4 -mt-8 flex flex-col">
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden border-b-2 border-border bg-cosmic-blue pt-12 pb-16 md:pt-16 md:pb-24">
+      <section className="relative overflow-hidden border-b-2 border-border bg-cosmic-blue pt-8 pb-10 md:pt-10 md:pb-14">
         <div className="mx-auto max-w-6xl px-4">
           <div className="flex flex-col gap-6">
             <div className="inline-flex items-center gap-2 self-start border-2 border-border bg-foreground px-3 py-1.5 shadow-shadow">
@@ -96,7 +166,7 @@ export default async function MapaAstralPage({ searchParams }: PageProps) {
             </div>
             
             <div className="max-w-3xl space-y-4">
-              <h1 className="font-heading text-6xl font-black uppercase leading-[0.9] md:text-8xl lg:text-9xl">
+              <h1 className="font-heading text-5xl font-black uppercase leading-[0.9] md:text-6xl lg:text-7xl">
                 Mapa <br />
                 <span className="text-white">Astral</span>
               </h1>
@@ -158,6 +228,8 @@ export default async function MapaAstralPage({ searchParams }: PageProps) {
                   cidade={params.cidade ?? ''}
                   dataStr={params.data!}
                   hora={params.hora}
+                  twitterMessage={twitterMessage}
+                  whatsappMessage={whatsappMessage}
                 />
               </div>
             </section>

@@ -5,6 +5,7 @@ import { wisp } from '@/lib/wisp'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import type { Metadata } from 'next'
+import { unstable_cache } from 'next/cache'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 
@@ -16,6 +17,12 @@ interface PostPageProps {
   params: Promise<{ slug: string }>
 }
 
+const getCachedPost = unstable_cache(
+  async (slug: string) => wisp.getPost(slug),
+  ['wisp-post'],
+  { revalidate: 3600, tags: ['wisp-post'] }
+)
+
 export async function generateStaticParams() {
   const { posts } = await wisp.getPosts({ limit: 'all' })
   return posts.map((post) => ({ slug: post.slug }))
@@ -23,7 +30,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
   const { slug } = await params
-  const result = await wisp.getPost(slug)
+  const result = await getCachedPost(slug)
   if (!result?.post) return {}
   const { post } = result
   return {
@@ -39,7 +46,7 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
 
 export default async function PostPage({ params }: PostPageProps) {
   const { slug } = await params
-  const result = await wisp.getPost(slug)
+  const result = await getCachedPost(slug)
 
   if (!result?.post) return notFound()
 
