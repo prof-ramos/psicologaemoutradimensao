@@ -9,6 +9,14 @@ function timingSafeCompare(a: string, b: string): boolean {
 }
 
 export async function POST(request: Request) {
+  if (!integrationsConfig.revalidationSecret) {
+    console.error('revalidate error: REVALIDATION_SECRET is not configured')
+    return Response.json(
+      { revalidated: false, message: 'REVALIDATION_SECRET não configurado', now: Date.now() },
+      { status: 500 }
+    )
+  }
+
   let secret: string | null = null
   try {
     const body = await request.json()
@@ -18,7 +26,6 @@ export async function POST(request: Request) {
   }
 
   if (
-    !integrationsConfig.revalidationSecret ||
     !secret ||
     !timingSafeCompare(secret, integrationsConfig.revalidationSecret)
   ) {

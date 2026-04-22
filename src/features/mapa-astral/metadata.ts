@@ -60,6 +60,8 @@ export function buildMapaAstralMetadata(params?: ValidMapaAstralParams): Metadat
 }
 
 export function verifyMapaAstralOgSignature(params: URLSearchParams): boolean {
+  if (!ogConfig.ogImageSecret) return false
+
   const toSign = new URLSearchParams()
   for (const key of ['data', 'lat', 'lng', 'hora', 'cidade']) {
     const value = params.get(key)

@@ -1,5 +1,5 @@
-import { getProductionRequiredSecret } from './shared'
+import { readTrimmedEnv } from './shared'
 
 export const ogConfig = {
-  ogImageSecret: getProductionRequiredSecret('OG_IMAGE_SECRET'),
+  ogImageSecret: readTrimmedEnv('OG_IMAGE_SECRET'),
 }

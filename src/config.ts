@@ -16,8 +16,8 @@ export interface AppConfig {
       description: string
     }
   }
-  ogImageSecret: string
-  revalidationSecret: string
+  ogImageSecret?: string
+  revalidationSecret?: string
   wisp: { blogId: string }
 }
 
