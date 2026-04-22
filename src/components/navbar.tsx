@@ -13,6 +13,7 @@ interface NavbarProps {
 const NAV_ITEMS = [
   { href: '/blog', label: 'Blog' },
   { href: '/mapa-astral', label: 'Mapa Astral' },
+  { href: '/seu-dia', label: 'Seu Dia' },
   { href: '/contato', label: 'Contato' },
 ]
 

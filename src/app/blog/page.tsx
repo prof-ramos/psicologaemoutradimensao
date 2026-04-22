@@ -53,7 +53,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           />
         </>
       ) : fetchError ? (
-        <div className="border-2 border-border bg-vibrant-pink p-4 shadow-shadow">
+        <div role="alert" aria-live="assertive" className="border-2 border-border bg-vibrant-pink p-4 shadow-shadow">
           <p className="font-heading text-lg font-black uppercase">Não foi possível carregar os posts.</p>
           <p className="mt-2 font-base text-sm text-foreground/80">
             Tente novamente em instantes. O conteúdo pode estar temporariamente indisponível.

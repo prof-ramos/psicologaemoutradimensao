@@ -18,10 +18,12 @@ const TICKER_ITEMS = [
 
 export default async function HomePage() {
   let posts: Awaited<ReturnType<typeof getRecentBlogPosts>> = []
+  let postsError = false
   try {
     posts = await getRecentBlogPosts(6)
   } catch (err) {
     console.error('getRecentBlogPosts error on HomePage:', err)
+    postsError = true
   }
 
   return (
@@ -147,7 +149,12 @@ export default async function HomePage() {
             </Button>
           </div>
 
-          {posts.length > 0 ? (
+          {postsError ? (
+            <div role="alert" aria-live="assertive" className="border-2 border-border bg-vibrant-pink p-4 shadow-shadow">
+              <p className="font-heading text-lg font-black uppercase">Não foi possível carregar os posts.</p>
+              <p className="mt-1 font-base text-sm text-foreground/80">Tente novamente em instantes.</p>
+            </div>
+          ) : posts.length > 0 ? (
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {posts.map((post) => (
                 <BlogPostCard key={post.id} post={post} />

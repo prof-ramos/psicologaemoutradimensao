@@ -165,3 +165,14 @@
     -webkit-text-fill-color: var(--foreground);
   }
 }
+
+@keyframes card-enter {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-card-enter {
+  animation: card-enter 0.38s ease both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-card-enter { animation: none; }
+}
