@@ -22,7 +22,9 @@ function verifySignature(params: URLSearchParams): boolean {
     .createHmac('sha256', config.ogImageSecret)
     .update(toSign.toString())
     .digest('hex')
-  return params.get('sig') === expected
+  const provided = params.get('sig') ?? ''
+  if (provided.length !== expected.length) return false
+  return crypto.timingSafeEqual(Buffer.from(provided, 'hex'), Buffer.from(expected, 'hex'))
 }
 
 export async function GET(req: NextRequest) {
@@ -38,8 +40,17 @@ export async function GET(req: NextRequest) {
   const horaStr = searchParams.get('hora') ?? ''
   const cidade = searchParams.get('cidade') ?? ''
 
+  if (!dataStr) return new Response('Missing data', { status: 400 })
+  if (!Number.isFinite(lat) || lat < -90  || lat > 90)  return new Response('Invalid lat', { status: 400 })
+  if (!Number.isFinite(lng) || lng < -180 || lng > 180) return new Response('Invalid lng', { status: 400 })
+
   const [year, month, day] = dataStr.split('-').map(Number)
   const [hour, minute] = horaStr ? horaStr.split(':').map(Number) : [12, 0]
+
+  if (!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(day))
+    return new Response('Invalid date', { status: 400 })
+  if (horaStr && (!Number.isFinite(hour) || !Number.isFinite(minute)))
+    return new Response('Invalid hora', { status: 400 })
 
   let result
   try {
