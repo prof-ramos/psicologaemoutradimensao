@@ -34,8 +34,8 @@ const buildConfig = (): AppConfig => {
     throw new Error('REVALIDATION_SECRET is missing in production')
   }
 
-  const name = process.env.NEXT_PUBLIC_BLOG_DISPLAY_NAME || 'PsicologaEmOutraDimensão'
-  const defaultDescription = process.env.NEXT_PUBLIC_BLOG_DESCRIPTION || 'Blog pessoal'
+  const name = (process.env.NEXT_PUBLIC_BLOG_DISPLAY_NAME || 'PsicologaEmOutraDimensão').trim()
+  const defaultDescription = (process.env.NEXT_PUBLIC_BLOG_DESCRIPTION || 'Blog pessoal').trim()
 
   return {
     baseUrl: (process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000').trim(),
