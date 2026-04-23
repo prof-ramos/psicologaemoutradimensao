@@ -1,3 +1,7 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # PsicologaEmOutraDimensão — Guia do Desenvolvedor
 
 Blog pessoal. Pseudônimo — sem disclaimers de qualquer tipo.
@@ -67,6 +71,10 @@ src/
       chart-svg.tsx         ← Roda zodiacal via @astrodraw/astrochart
       chart-svg-wrapper.tsx ← Wrapper client para o gráfico
       chart-details.tsx     ← Tabela de posições, aspectos, ASC/MC
+    seu-dia/
+      page.tsx              ← Página "Seu Dia" (Server Component)
+      date-form.tsx         ← Formulário de data (Client Component)
+      day-results.tsx       ← Cards de eventos/nascimentos/mortes + ExactDaySection
     contato/page.tsx        ← Link para https://x.com/Gayaliz_
     api/
       geocode/route.ts      ← GET /api/geocode?q=... (proxy Nominatim)
@@ -87,6 +95,12 @@ src/
     og-image.ts             ← Gera URL de OG image com HMAC
     horoscope.ts            ← calculateHoroscope() — cálculos astrológicos
     horoscope-i18n.ts       ← Traduções pt-BR de planetas, signos, aspectos
+  features/
+    seu-dia/
+      types.ts              ← WikiPage, WikiEvent, OnThisDayResult, ValidSeuDiaParams
+      query.ts              ← parseSeuDiaParams() → { kind: 'empty'|'invalid'|'valid' }
+      service.ts            ← fetchOnThisDay(month, day, birthYear?) — Wikipedia API, revalidate 86400
+      index.ts              ← barrel
   config.ts                 ← Lê e valida env vars; exporta config tipada
 
 __tests__/
@@ -102,6 +116,9 @@ __tests__/
     ui/button.test.tsx
     ui/badge.test.tsx
     chart-form.test.tsx
+
+e2e/
+  seu-dia.spec.ts           ← Testes Playwright para /seu-dia (13 testes, API real)
 ```
 
 ### Dependências-chave
@@ -114,6 +131,7 @@ __tests__/
 | `date-fns` | Formatação de datas em pt-BR |
 | `sanitize-html` | Sanitiza HTML dos posts |
 | `rss` | Gera feed RSS |
+| `@playwright/test` | Testes E2E (suíte `e2e/`) |
 
 ---
 
@@ -159,6 +177,27 @@ Princípios não negociáveis:
 - componentes com presença física e leitura direta
 - hierarquia visual pode evoluir, mas sem abandonar o caráter neobrutalist
 
+### Seu Dia — fluxo de dados
+
+```text
+URL: /seu-dia?data=1990-04-22
+         ↓
+page.tsx (Server) → parseSeuDiaParams(searchParams) → ValidSeuDiaParams | 'invalid' | 'empty'
+         ↓
+fetchOnThisDay(month, day, birthYear) → OnThisDayResult
+  { events[], births[], deaths[], exactDayEvents[] }  ← revalidate: 86400
+         ↓
+DayResults → ExactDaySection (bg-foreground invertido, só exibe se exactDayEvents.length > 0)
+           → Section('events') / Section('births') / Section('deaths')
+```
+
+**Importante:** A API da Wikipedia é chamada server-side (`next: { revalidate: 86400 }`).
+`page.route()` do Playwright não intercepta essas requisições — os testes E2E usam a API real
+com datas âncora determinísticas (ex: `1969-07-20` = pouso lunar).
+
+**DOM da ExactDaySection:** dois elementos separados — `<p>Aconteceu neste dia</p>` e `<h3>em {year}</h3>`.
+Não existe texto unificado "Neste dia, em 1969" em nenhum elemento.
+
 ### ISR e publicação de posts
 
 Posts novos no WISP aparecem automaticamente em até 1h
@@ -180,7 +219,9 @@ vercel --prod     # deploy direto para produção
 
 ## 4. Abordagem de teste
 
-Todos os testes ficam em `__tests__/` usando Jest + React Testing Library.
+### Testes unitários / componentes (Jest)
+
+Ficam em `__tests__/` usando Jest + React Testing Library.
 Configuração em `jest.config.ts` (raiz do projeto) usando `nextJest`.
 
 ```bash
@@ -211,6 +252,23 @@ npx jest --no-coverage        # mais rápido, sem relatório de cobertura
 | `badge.test.tsx` | Classe `bg-cosmic-blue` no variant blue |
 | `chart-form.test.tsx` | Campos, submit, navegação e busca de cidade |
 | `blog-post-card.test.tsx` | Título, descrição, link `/blog/[slug]`, tag |
+
+### Testes E2E (Playwright)
+
+Ficam em `e2e/`. Requerem servidor rodando (`npm run dev` ou build+start).
+
+```bash
+npx playwright test              # rodar todos os testes E2E
+npx playwright test e2e/seu-dia  # rodar só o arquivo seu-dia.spec.ts
+npx playwright test --ui         # modo interativo
+npx playwright test --headed     # browser visível
+```
+
+**Limitação crítica:** `page.route()` só intercepta requisições do browser.
+Chamadas feitas em Server Components (fetch server-side) **não podem ser mockadas**.
+Os testes que dependem de dados da API usam datas âncora determinísticas:
+- `1990-04-22` → data genérica com dados garantidos na Wikipedia
+- `1969-07-20` → pouso lunar (Apollo 11) para testar ExactDaySection
 
 ---
 
