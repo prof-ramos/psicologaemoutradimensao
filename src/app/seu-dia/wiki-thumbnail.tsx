@@ -43,7 +43,6 @@ export function WikiThumbnail({
       height={height}
       sizes={sizes}
       className={className}
-      unoptimized
       onError={() => setFailed(true)}
     />
   )
