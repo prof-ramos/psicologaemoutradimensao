@@ -1,5 +1,4 @@
 import { BlogPostContent } from '@/components/blog-post-content'
-import type { BadgeProps } from '@/components/ui/badge'
 import { Badge } from '@/components/ui/badge'
 import {
   getAllBlogPosts,
@@ -13,7 +12,7 @@ import { notFound } from 'next/navigation'
 
 export const revalidate = 3600
 
-const TAG_VARIANTS: Array<BadgeProps['variant']> = ['blue', 'pink', 'orange', 'default']
+const TAG_CLASSES = ['bg-cosmic-blue', 'bg-vibrant-pink', 'bg-electric-orange', 'bg-main']
 
 interface PostPageProps {
   params: Promise<{ slug: string }>
@@ -54,7 +53,7 @@ export default async function PostPage({ params }: PostPageProps) {
         {post.tags.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {post.tags.map((tag, i) => (
-              <Badge key={tag.id} variant={TAG_VARIANTS[i % TAG_VARIANTS.length]}>
+              <Badge key={tag.id} className={TAG_CLASSES[i % TAG_CLASSES.length]}>
                 {tag.name}
               </Badge>
             ))}

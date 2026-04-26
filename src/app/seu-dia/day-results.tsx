@@ -1,9 +1,33 @@
 import { ExternalLink } from 'lucide-react'
 import type { OnThisDayResult, WikiEvent, ValidSeuDiaParams } from '@/features/seu-dia'
+import { WikiThumbnail } from './wiki-thumbnail'
 
 interface DayResultsProps {
   result: OnThisDayResult
   params: ValidSeuDiaParams
+}
+
+function normalizeWikiTitle(title: string) {
+  return title.replaceAll('_', ' ').trim()
+}
+
+function normalizeWikiText(text: string | undefined) {
+  return text ? text.replaceAll('_', ' ').trim() : ''
+}
+
+function getEventLead(text: string | undefined) {
+  const normalized = normalizeWikiText(text)
+  return normalized.split(',')[0]?.replace(/\.$/, '').trim() ?? ''
+}
+
+function getPersonName(event: WikiEvent) {
+  return normalizeWikiTitle(event.pages[0]?.title ?? '') || getEventLead(event.text)
+}
+
+function shouldContainThumbnail(thumbnail: { source: string; width: number; height: number } | undefined) {
+  if (!thumbnail) return false
+  const aspectRatio = thumbnail.width / thumbnail.height
+  return thumbnail.width < 220 || thumbnail.height < 140 || aspectRatio < 1.2
 }
 
 // ── Cards ──────────────────────────────────────────────────────────────────
@@ -11,8 +35,12 @@ interface DayResultsProps {
 function EventCard({ event, index, accent }: { event: WikiEvent; index: number; accent?: string }) {
   const page = event.pages[0]
   const wikiUrl = page?.content_urls?.desktop.page
-  const thumb = page?.thumbnail?.source
-  const extract = page?.extract?.split('. ')[0]
+  const thumbnail = page?.thumbnail
+  const thumb = thumbnail?.source
+  const extract = normalizeWikiText(page?.extract?.split('. ')[0])
+  const imageFitClass = shouldContainThumbnail(thumbnail)
+    ? 'object-contain p-4 bg-muted'
+    : 'object-cover'
 
   return (
     <article
@@ -21,8 +49,15 @@ function EventCard({ event, index, accent }: { event: WikiEvent; index: number; 
     >
       {thumb && (
         <div className="relative w-full h-28 border-b-2 border-border overflow-hidden flex-shrink-0">
-          <img src={thumb} alt="" aria-hidden="true" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+          <WikiThumbnail
+            src={thumb}
+            fill
+            sizes="(max-width: 640px) 100vw, 50vw"
+            className={imageFitClass}
+          />
+          {!shouldContainThumbnail(thumbnail) && (
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+          )}
         </div>
       )}
       <div className="flex flex-1 flex-col p-4 gap-3">
@@ -42,7 +77,7 @@ function EventCard({ event, index, accent }: { event: WikiEvent; index: number; 
             href={wikiUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 font-heading text-[11px] font-black uppercase tracking-wider mt-auto hover:underline self-start"
+            className="mt-auto inline-flex min-h-11 items-center gap-1 self-start font-heading text-[11px] font-black uppercase tracking-wider hover:underline"
           >
             Wikipedia <ExternalLink className="h-3 w-3" aria-hidden="true" />
           </a>
@@ -56,8 +91,8 @@ function PersonCard({ event, index, accent }: { event: WikiEvent; index: number;
   const page = event.pages[0]
   const wikiUrl = page?.content_urls?.desktop.page
   const thumb = page?.thumbnail?.source
-  const name = page?.title ?? ''
-  const extract = page?.extract?.split('. ')[0]
+  const name = getPersonName(event)
+  const extract = normalizeWikiText(page?.extract?.split('. ')[0])
 
   return (
     <article
@@ -66,7 +101,12 @@ function PersonCard({ event, index, accent }: { event: WikiEvent; index: number;
     >
       {thumb ? (
         <div className="relative w-20 flex-shrink-0 border-r-2 border-border overflow-hidden">
-          <img src={thumb} alt="" aria-hidden="true" className="w-full h-full object-cover" />
+          <WikiThumbnail
+            src={thumb}
+            fill
+            sizes="80px"
+            className="object-cover"
+          />
         </div>
       ) : (
         <div className={`w-3 flex-shrink-0 ${accent}`} aria-hidden="true" />
@@ -87,7 +127,7 @@ function PersonCard({ event, index, accent }: { event: WikiEvent; index: number;
               href={wikiUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-heading text-[11px] font-black uppercase tracking-wider hover:underline"
+              className="inline-flex min-h-11 items-center gap-1 font-heading text-[11px] font-black uppercase tracking-wider hover:underline"
             >
               Wikipedia <ExternalLink className="h-3 w-3" aria-hidden="true" />
             </a>
@@ -111,9 +151,11 @@ function ExactDaySection({ events, year }: { events: WikiEvent[]; year: number }
           {year}
         </div>
         <p className="font-heading text-[11px] font-black uppercase tracking-[0.2em] text-main">
-          Aconteceu neste dia
+          No seu ano
         </p>
-        <h3 className="font-heading text-2xl font-black uppercase mt-0.5">em {year}</h3>
+        <h3 className="font-heading text-2xl font-black uppercase mt-0.5">
+          Aconteceu em {year}
+        </h3>
       </div>
 
       {/* Cards */}
@@ -122,19 +164,18 @@ function ExactDaySection({ events, year }: { events: WikiEvent[]; year: number }
           const page = event.pages[0]
           const wikiUrl = page?.content_urls?.desktop.page
           const thumb = page?.thumbnail?.source
-          const name = page?.title
+          const name = getPersonName(event)
+          const description = normalizeWikiText(event.text)
 
           return (
             <article
               key={`exact-${i}`}
-              className="animate-card-enter bg-main border-2 border-background/30 flex gap-3 p-3 overflow-hidden"
+              className="animate-card-enter bg-main text-foreground border-2 border-background/30 flex gap-3 p-3 overflow-hidden"
               style={{ animationDelay: `${i * 60}ms` }}
             >
               {thumb && (
-                <img
+                <WikiThumbnail
                   src={thumb}
-                  alt=""
-                  aria-hidden="true"
                   width={56}
                   height={56}
                   className="h-14 w-14 flex-shrink-0 border-2 border-foreground/30 object-cover"
@@ -146,13 +187,13 @@ function ExactDaySection({ events, year }: { events: WikiEvent[]; year: number }
                     {name}
                   </p>
                 )}
-                <p className="font-base text-xs leading-snug line-clamp-3">{event.text}</p>
+                <p className="font-base text-xs leading-snug line-clamp-3">{description}</p>
                 {wikiUrl && (
                   <a
                     href={wikiUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 font-heading text-[11px] font-black uppercase tracking-wider mt-auto hover:underline"
+                    className="mt-auto inline-flex min-h-11 items-center gap-1 font-heading text-[11px] font-black uppercase tracking-wider hover:underline"
                   >
                     Wikipedia <ExternalLink className="h-3 w-3" aria-hidden="true" />
                   </a>
@@ -171,9 +212,9 @@ function ExactDaySection({ events, year }: { events: WikiEvent[]; year: number }
 type SectionKind = 'events' | 'births' | 'deaths'
 
 const SECTION_META: Record<SectionKind, { label: string; accent: string; cardAccent: string }> = {
-  events:  { label: 'Eventos Históricos', accent: 'bg-electric-orange', cardAccent: 'bg-electric-orange' },
-  births:  { label: 'Nascimentos',        accent: 'bg-cosmic-blue',     cardAccent: 'bg-cosmic-blue'     },
-  deaths:  { label: 'Mortes',             accent: 'bg-vibrant-pink',    cardAccent: 'bg-vibrant-pink'    },
+  events:  { label: 'Eventos do dia',      accent: 'bg-electric-orange', cardAccent: 'bg-electric-orange' },
+  births:  { label: 'Nasceram neste dia',  accent: 'bg-cosmic-blue',     cardAccent: 'bg-cosmic-blue'     },
+  deaths:  { label: 'Morreram neste dia',  accent: 'bg-vibrant-pink',    cardAccent: 'bg-vibrant-pink'    },
 }
 
 function Section({
@@ -221,7 +262,27 @@ function Section({
 
 // ── Root ────────────────────────────────────────────────────────────────────
 
+function EmptyState() {
+  return (
+    <div className="border-2 border-border bg-secondary-background p-6 shadow-shadow">
+      <p className="font-heading text-xl font-black uppercase">
+        Ainda não encontramos registros para esta data.
+      </p>
+      <p className="mt-2 max-w-xl font-base text-sm leading-relaxed text-muted-foreground">
+        A Wikipedia pt-BR pode não ter dados suficientes para esse dia no momento. Tente outra data
+        ou volte mais tarde, porque a base pública é atualizada continuamente.
+      </p>
+    </div>
+  )
+}
+
 export function DayResults({ result, params }: DayResultsProps) {
+  const hasResults =
+    result.exactDayEvents.length > 0 ||
+    result.events.length > 0 ||
+    result.births.length > 0 ||
+    result.deaths.length > 0
+
   return (
     <section id="resultado" className="scroll-mt-24 space-y-12">
       {/* Date heading */}
@@ -233,15 +294,23 @@ export function DayResults({ result, params }: DayResultsProps) {
           {params.display}
         </h2>
         <div className="h-1.5 w-20 bg-main border-2 border-border" />
+        <p className="max-w-2xl font-base text-sm leading-relaxed text-muted-foreground">
+          Dados públicos da Wikipedia pt-BR. Cada card mantém o link da fonte quando a página
+          correspondente está disponível.
+        </p>
       </div>
 
       {/* Sections */}
-      <div className="space-y-14">
-        <ExactDaySection events={result.exactDayEvents} year={params.year} />
-        <Section kind="events" events={result.events} />
-        <Section kind="births" events={result.births} />
-        <Section kind="deaths" events={result.deaths} />
-      </div>
+      {hasResults ? (
+        <div className="space-y-14">
+          <ExactDaySection events={result.exactDayEvents} year={params.year} />
+          <Section kind="events" events={result.events} />
+          <Section kind="births" events={result.births} />
+          <Section kind="deaths" events={result.deaths} />
+        </div>
+      ) : (
+        <EmptyState />
+      )}
     </section>
   )
 }

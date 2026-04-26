@@ -4,3 +4,87 @@ Review directory: /Users/gabrielramos/psicologaemoutradimensao
 
 Connecting to review service
 Setting up
+Summarizing
+Reviewing
+
+============================================================================
+File: src/components/ui/card.tsx
+Line: 22 to 25
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @src/components/ui/card.tsx around lines 22 - 25, The Tailwind arbitrary variant [.border-b]:pb-6 is invalid; update the class string passed to cn in the className assignment inside src/components/ui/card.tsx to use the self-selector syntax [&.border-b]:pb-6 (i.e., replace [.border-b]:pb-6 with [&.border-b]:pb-6) so the element applies pb-6 when it has the border-b class; ensure the change is made in the className value where cn(...) is called.
+
+============================================================================
+File: src/components/ui/card.tsx
+Line: 77 to 79
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @src/components/ui/card.tsx around lines 77 - 79, The className uses an incorrect arbitrary selector '[.border-t]:pt-6' which should be the parent-aware selector '[&.border-t]:pt-6' so Tailwind applies the style when the card has the border-t class; update the className call in the CardFooter component (the JSX with data-slot="card-footer" where cn('flex items-center px-6 [.border-t]:pt-6', className) is used) to replace '[.border-t]:pt-6' with '[&.border-t]:pt-6' so the conditional padding-top works correctly.
+
+============================================================================
+File: src/components/ui/navigation-menu.tsx
+Line: 19 to 26
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @src/components/ui/navigation-menu.tsx around lines 19 - 26, The root NavigationMenuPrimitive.Root is missing the group class needed for group-based selectors to work; update the className passed to NavigationMenuPrimitive.Root (where cn(...) is used) to include "group/navigation-menu" so selectors like those in NavigationMenuContent (e.g., group-data-[viewport=false]/navigation-menu:) can match and apply the conditional viewport styles.
+
+============================================================================
+File: src/components/ui/navigation-menu.tsx
+Line: 22 to 25
+Type: refactor_suggestion
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @src/components/ui/navigation-menu.tsx around lines 22 - 25, The navigation menu's root class list (the cn call that builds className in the NavigationMenu component) is missing the required NeoBrutalism shadow; add the utility "shadow-shadow" to the static class string inside the cn(...) invocation (alongside 'border-2 border-border' and other classes) so the component applies the mandated hard displaced shadow while preserving the existing className prop merge.
+
+============================================================================
+File: src/app/seu-dia/wiki-thumbnail.tsx
+Line: 25 to 34
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @src/app/seu-dia/wiki-thumbnail.tsx around lines 25 - 34, The fallback render for the failed image in the WikiThumbnail component currently returns a div inside the if (failed) branch without NeoBrutalism styling; update that fallback div (the JSX returned in the if (failed) block) to include the design system classes—add "border-2 border-border" and "shadow-shadow" (preserving the existing "bg-muted p-3 font-heading text-[10px] font-black uppercase tracking-wider text-muted-foreground") so the placeholder matches the NeoBrutalism visual system.
+
+============================================================================
+File: src/components/ui/navigation-menu.tsx
+Line: 130 to 137
+Type: refactor_suggestion
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @src/components/ui/navigation-menu.tsx around lines 130 - 137, The NavigationMenuPrimitive.Viewport component is missing the NeoBrutalism hard offset shadow class; update the className string used in NavigationMenuPrimitive.Viewport (the component rendering the navigation menu viewport) to include the 'shadow-shadow' utility alongside the existing 'border-2 border-border' classes so the viewport has the same hard displaced shadow as other UI elements.
+
+============================================================================
+File: src/app/page.tsx
+Line: 3 to 4
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @src/app/page.tsx around lines 3 - 4, Missing import for the CalendarDays icon: add CalendarDays to the lucide-react import in the module that defines the page component so the component using CalendarDays (referenced in this file alongside getRecentBlogPosts, ArrowRight, Sparkles, Star) resolves correctly; alternatively, if CalendarDays should not be used, remove its usage from the JSX to avoid the runtime reference error.
+
+============================================================================
+File: src/app/seu-dia/page.tsx
+Line: 24 to 27
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @src/app/seu-dia/page.tsx around lines 24 - 27, Wrap the call to fetchOnThisDay (the expression using parsed.kind === 'valid' ? await fetchOnThisDay(parsed.value.month, parsed.value.day, parsed.value.year) : null) in a try/catch so any network or API errors are caught; on error set a local fetchError state/variable (e.g., a string) and avoid throwing so the page can render, and add the suggested error UI block that displays fetchError (using role="alert" and aria-live="assertive") in the page render path—ensure you reference parsed and fetchOnThisDay when locating the call and use the error state name (fetchError) in the render condition.
+
+Review completed: 8 findings ✔

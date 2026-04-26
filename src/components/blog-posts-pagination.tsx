@@ -29,7 +29,7 @@ export function BlogPostsPagination({ pagination }: { pagination: Pagination }) 
   return (
     <nav aria-label="Blog posts pagination" className="flex items-center justify-between pt-8">
       {hasPrev ? (
-        <Button asChild variant="outline">
+        <Button asChild variant="neutral">
           <Link href={buildHref(page - 1)}>
             <ChevronLeft className="mr-1 h-4 w-4" />
             Anterior
@@ -42,7 +42,7 @@ export function BlogPostsPagination({ pagination }: { pagination: Pagination }) 
         {page} / {totalPages}
       </span>
       {hasNext ? (
-        <Button asChild variant="outline">
+        <Button asChild variant="neutral">
           <Link href={buildHref(page + 1)}>
             Próxima
             <ChevronRight className="ml-1 h-4 w-4" />

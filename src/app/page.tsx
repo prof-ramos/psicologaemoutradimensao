@@ -1,7 +1,7 @@
 import { BlogPostCard } from '@/components/blog-post-card'
 import { Button } from '@/components/ui/button'
 import { getRecentBlogPosts } from '@/features/blog'
-import { ArrowRight, Sparkles, Star } from 'lucide-react'
+import { ArrowRight, CalendarDays, Sparkles, Star } from 'lucide-react'
 import Link from 'next/link'
 
 export const revalidate = 3600
@@ -79,7 +79,13 @@ export default async function HomePage() {
                     Ler os posts
                   </Link>
                 </Button>
-                <Button asChild variant="outline" size="lg">
+                <Button asChild variant="neutral" size="lg" className="bg-cosmic-blue">
+                  <Link href="/seu-dia">
+                    <CalendarDays className="h-4 w-4" aria-hidden="true" />
+                    Ver seu dia
+                  </Link>
+                </Button>
+                <Button asChild variant="neutral" size="lg">
                   <Link href="/contato">
                     @Gayaliz_
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -141,7 +147,12 @@ export default async function HomePage() {
 
           <div className="flex items-baseline justify-between">
             <h2 id="recent-posts-heading" className="font-heading text-3xl font-black uppercase">Posts recentes</h2>
-            <Button asChild variant="ghost" size="sm">
+            <Button
+              asChild
+              variant="noShadow"
+              size="sm"
+              className="border-transparent bg-transparent text-foreground hover:bg-muted"
+            >
               <Link href="/blog">
                 Ver todos
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />

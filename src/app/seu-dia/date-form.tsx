@@ -1,6 +1,9 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Loader2, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
@@ -23,23 +26,23 @@ export function DateForm({ defaultValue = '' }: DateFormProps) {
   }
 
   return (
-    <div className="border-2 border-border bg-background p-6 shadow-shadow md:p-8">
+    <Card className="p-6 md:p-8">
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="max-w-xs space-y-2">
-          <label
+          <Label
             htmlFor="nascimento-data"
-            className="font-heading text-sm font-black uppercase tracking-wider text-foreground"
+            className="font-black uppercase tracking-wider text-foreground"
           >
             Data de nascimento *
-          </label>
-          <input
+          </Label>
+          <Input
             id="nascimento-data"
             type="date"
             required
             aria-required="true"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="w-full border-2 border-border bg-secondary-background px-4 py-3 font-base text-sm shadow-shadow focus:outline-none focus:ring-2 focus:ring-main transition-all"
+            className="h-auto px-4 py-3 shadow-shadow"
           />
         </div>
 
@@ -57,6 +60,6 @@ export function DateForm({ defaultValue = '' }: DateFormProps) {
           <span>Descobrir Meu Dia</span>
         </Button>
       </form>
-    </div>
+    </Card>
   )
 }
