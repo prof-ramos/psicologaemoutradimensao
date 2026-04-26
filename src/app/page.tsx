@@ -1,7 +1,7 @@
 import { BlogPostCard } from '@/components/blog-post-card'
 import { Button } from '@/components/ui/button'
 import { getRecentBlogPosts } from '@/features/blog'
-import { ArrowRight, Sparkles, Star } from 'lucide-react'
+import { ArrowRight, CalendarDays, Sparkles, Star } from 'lucide-react'
 import Link from 'next/link'
 
 export const revalidate = 3600
@@ -18,10 +18,12 @@ const TICKER_ITEMS = [
 
 export default async function HomePage() {
   let posts: Awaited<ReturnType<typeof getRecentBlogPosts>> = []
+  let postsError = false
   try {
     posts = await getRecentBlogPosts(6)
   } catch (err) {
     console.error('getRecentBlogPosts error on HomePage:', err)
+    postsError = true
   }
 
   return (
@@ -77,7 +79,13 @@ export default async function HomePage() {
                     Ler os posts
                   </Link>
                 </Button>
-                <Button asChild variant="outline" size="lg">
+                <Button asChild variant="neutral" size="lg" className="bg-cosmic-blue">
+                  <Link href="/seu-dia">
+                    <CalendarDays className="h-4 w-4" aria-hidden="true" />
+                    Ver seu dia
+                  </Link>
+                </Button>
+                <Button asChild variant="neutral" size="lg">
                   <Link href="/contato">
                     @Gayaliz_
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -139,7 +147,12 @@ export default async function HomePage() {
 
           <div className="flex items-baseline justify-between">
             <h2 id="recent-posts-heading" className="font-heading text-3xl font-black uppercase">Posts recentes</h2>
-            <Button asChild variant="ghost" size="sm">
+            <Button
+              asChild
+              variant="noShadow"
+              size="sm"
+              className="border-transparent bg-transparent text-foreground hover:bg-muted"
+            >
               <Link href="/blog">
                 Ver todos
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -147,7 +160,12 @@ export default async function HomePage() {
             </Button>
           </div>
 
-          {posts.length > 0 ? (
+          {postsError ? (
+            <div role="alert" aria-live="assertive" className="border-2 border-border bg-vibrant-pink p-4 shadow-shadow">
+              <p className="font-heading text-lg font-black uppercase">Não foi possível carregar os posts.</p>
+              <p className="mt-1 font-base text-sm text-foreground/80">Tente novamente em instantes.</p>
+            </div>
+          ) : posts.length > 0 ? (
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {posts.map((post) => (
                 <BlogPostCard key={post.id} post={post} />

@@ -102,110 +102,110 @@ type HoroscopeInput = {
 
 export function calculateHoroscope(input: HoroscopeInput): HoroscopeResult {
   try {
-  const OriginClass = Origin as unknown as OriginConstructor
-  const HoroscopeClass = Horoscope as unknown as HoroscopeConstructor
+    const OriginClass = Origin as unknown as OriginConstructor
+    const HoroscopeClass = Horoscope as unknown as HoroscopeConstructor
 
-  const origin = new OriginClass({
-    year:      input.year,
-    month:     input.month - 1,   // Origin usa meses 0-indexed
-    date:      input.day,
-    hour:      input.hour,
-    minute:    input.minute,
-    latitude:  input.lat,
-    longitude: input.lng,
-  })
+    const origin = new OriginClass({
+      year:      input.year,
+      month:     input.month - 1,   // Origin usa meses 0-indexed
+      date:      input.day,
+      hour:      input.hour,
+      minute:    input.minute,
+      latitude:  input.lat,
+      longitude: input.lng,
+    })
 
-  const horoscope = new HoroscopeClass({
-    origin,
-    houseSystem:      'placidus',
-    zodiac:           'tropical',
-    aspectPoints:     ['bodies'],
-    aspectWithPoints: ['bodies'],
-    aspectTypes:      ['major'],
-    customOrbs: {
-      conjunction: 10,
-      opposition:  10,
-      trine:        8,
-      square:       7,
-      sextile:      6,
-      quincunx:     3,
-    },
-  })
+    const horoscope = new HoroscopeClass({
+      origin,
+      houseSystem:      'placidus',
+      zodiac:           'tropical',
+      aspectPoints:     ['bodies'],
+      aspectWithPoints: ['bodies'],
+      aspectTypes:      ['major'],
+      customOrbs: {
+        conjunction: 10,
+        opposition:  10,
+        trine:        8,
+        square:       7,
+        sextile:      6,
+        quincunx:     3,
+      },
+    })
 
-  // ── Posições planetárias ──────────────────────────────────────────────
-  const planets: Record<string, number[]> = {}
-  const positions: PlanetPosition[] = []
+    // ── Posições planetárias ──────────────────────────────────────────────
+    const planets: Record<string, number[]> = {}
+    const positions: PlanetPosition[] = []
 
-  for (const body of horoscope.CelestialBodies.all) {
-    const key: string = body.key          // "sun", "moon", …
+    for (const body of horoscope.CelestialBodies.all) {
+      const key: string = body.key          // "sun", "moon", …
 
-    if (!SUPPORTED_BODY_KEYS.has(key)) {
-      continue
+      if (!SUPPORTED_BODY_KEYS.has(key)) {
+        continue
+      }
+
+      const dec: number = body.ChartPosition.Ecliptic.DecimalDegrees
+      const isRetro: boolean = !!body.isRetrograde
+
+      planets[toAstroChartKey(key)] = isRetro ? [dec, -0.2] : [dec]
+
+      positions.push({
+        key,
+        namePt:         PLANET_PT[key]           ?? key,
+        signPt:         SIGN_PT[body.Sign.label]  ?? body.Sign.label,
+        degreeInSign:   dec % 30,
+        decimalDegrees: dec,
+        isRetrograde:   isRetro,
+        house: input.hasTime ? (body.House?.id ?? 0) : 0,
+      })
     }
 
-    const dec: number = body.ChartPosition.Ecliptic.DecimalDegrees
-    const isRetro: boolean = !!body.isRetrograde
+    // ── Cúspides das casas ────────────────────────────────────────────────
+    const cusps: number[] = input.hasTime
+      ? horoscope.Houses.map((house) => house.ChartPosition.StartPosition.Ecliptic.DecimalDegrees)
+      : []
 
-    planets[toAstroChartKey(key)] = isRetro ? [dec, -0.2] : [dec]
+    // ── Aspectos ──────────────────────────────────────────────────────────
+    const aspects: AspectInfo[] = horoscope.Aspects.all
+      .filter((asp) =>
+        !!asp.point1Key && !!asp.point2Key &&
+        SUPPORTED_BODY_KEYS.has(asp.point1Key) &&
+        SUPPORTED_BODY_KEYS.has(asp.point2Key)
+      )
+      .map((asp) => ({
+        planet1: (asp.point1Key ? PLANET_PT[asp.point1Key] : undefined) ?? asp.point1Label ?? '—',
+        planet2: (asp.point2Key ? PLANET_PT[asp.point2Key] : undefined) ?? asp.point2Label ?? '—',
+        typePt:  (asp.aspectKey ? ASPECT_PT[asp.aspectKey] : undefined) ?? asp.label ?? '—',
+        orb:     Math.round(asp.orb * 10) / 10,
+      }))
 
-    positions.push({
-      key,
-      namePt:         PLANET_PT[key]           ?? key,
-      signPt:         SIGN_PT[body.Sign.label]  ?? body.Sign.label,
-      degreeInSign:   dec % 30,
-      decimalDegrees: dec,
-      isRetrograde:   isRetro,
-      house: input.hasTime ? (body.House?.id ?? 0) : 0,
-    })
-  }
+    // ── Ascendente e MC ───────────────────────────────────────────────────
+    let ascendant: HoroscopeResult['ascendant']
+    let midheaven: HoroscopeResult['midheaven']
 
-  // ── Cúspides das casas ────────────────────────────────────────────────
-  const cusps: number[] = input.hasTime
-    ? horoscope.Houses.map((house) => house.ChartPosition.StartPosition.Ecliptic.DecimalDegrees)
-    : []
+    if (input.hasTime) {
+      const asc = horoscope.Ascendant
+      const mc  = horoscope.Midheaven
 
-  // ── Aspectos ──────────────────────────────────────────────────────────
-  const aspects: AspectInfo[] = horoscope.Aspects.all
-    .filter((asp) => {
-      const point1Supported = asp.point1Key ? SUPPORTED_BODY_KEYS.has(asp.point1Key) : true
-      const point2Supported = asp.point2Key ? SUPPORTED_BODY_KEYS.has(asp.point2Key) : true
-      return point1Supported && point2Supported
-    })
-    .map((asp) => ({
-      planet1: (asp.point1Key ? PLANET_PT[asp.point1Key] : undefined) ?? asp.point1Label ?? '—',
-      planet2: (asp.point2Key ? PLANET_PT[asp.point2Key] : undefined) ?? asp.point2Label ?? '—',
-      typePt:  (asp.aspectKey ? ASPECT_PT[asp.aspectKey] : undefined) ?? asp.label ?? '—',
-      orb:     Math.round(asp.orb * 10) / 10,
-    }))
+      if (asc) {
+        const deg = asc.ChartPosition.Ecliptic.DecimalDegrees as number
+        ascendant = {
+          signPt:       SIGN_PT[asc.Sign.label] ?? asc.Sign.label,
+          degree:       deg,
+          degreeInSign: deg % 30,
+        }
+      }
 
-  // ── Ascendente e MC ───────────────────────────────────────────────────
-  let ascendant: HoroscopeResult['ascendant']
-  let midheaven: HoroscopeResult['midheaven']
-
-  if (input.hasTime) {
-    const asc = horoscope.Ascendant
-    const mc  = horoscope.Midheaven
-
-    if (asc) {
-      const deg = asc.ChartPosition.Ecliptic.DecimalDegrees as number
-      ascendant = {
-        signPt:       SIGN_PT[asc.Sign.label] ?? asc.Sign.label,
-        degree:       deg,
-        degreeInSign: deg % 30,
+      if (mc) {
+        const deg = mc.ChartPosition.Ecliptic.DecimalDegrees as number
+        midheaven = {
+          signPt:       SIGN_PT[mc.Sign.label] ?? mc.Sign.label,
+          degree:       deg,
+          degreeInSign: deg % 30,
+        }
       }
     }
 
-    if (mc) {
-      const deg = mc.ChartPosition.Ecliptic.DecimalDegrees as number
-      midheaven = {
-        signPt:       SIGN_PT[mc.Sign.label] ?? mc.Sign.label,
-        degree:       deg,
-        degreeInSign: deg % 30,
-      }
-    }
-  }
-
-  return { planets, cusps, positions, aspects, hasHouses: input.hasTime, ascendant, midheaven }
+    return { planets, cusps, positions, aspects, hasHouses: input.hasTime, ascendant, midheaven }
   } catch (err) {
     console.error('calculateHoroscope error:', err)
     throw new Error(

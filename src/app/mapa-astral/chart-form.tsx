@@ -1,6 +1,9 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Loader2, Search, Globe } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
@@ -63,46 +66,46 @@ export function ChartForm({
   const hasValidCoords = Number.isFinite(nLat) && Number.isFinite(nLng)
 
   return (
-    <div className="border-2 border-border bg-background p-6 shadow-shadow md:p-8">
+    <Card className="p-6 md:p-8">
       <form onSubmit={handleSubmit} className="space-y-8">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           {/* Data de Nascimento */}
           <div className="space-y-2">
-            <label
+            <Label
               htmlFor="nascimento-data"
-              className="font-heading text-sm font-black uppercase tracking-wider text-foreground"
+              className="font-black uppercase tracking-wider text-foreground"
             >
               Data de nascimento *
-            </label>
-            <input
+            </Label>
+            <Input
               id="nascimento-data"
               type="date"
               required
               aria-required="true"
               value={birthDate}
               onChange={e => setBirthDate(e.target.value)}
-              className="w-full border-2 border-border bg-secondary-background px-4 py-3 font-base text-sm shadow-shadow focus:outline-none focus:ring-2 focus:ring-main transition-all"
+              className="h-auto px-4 py-3 shadow-shadow"
             />
           </div>
 
           {/* Hora de Nascimento */}
           <div className="space-y-2">
-            <label
+            <Label
               htmlFor="nascimento-hora"
-              className="font-heading text-sm font-black uppercase tracking-wider text-foreground"
+              className="font-black uppercase tracking-wider text-foreground"
             >
               Hora de nascimento{' '}
               <span className="font-normal normal-case text-muted-foreground opacity-70">
                 (opcional)
               </span>
-            </label>
+            </Label>
             <div className="flex flex-col gap-2">
-              <input
+              <Input
                 id="nascimento-hora"
                 type="time"
                 value={birthTime}
                 onChange={e => setBirthTime(e.target.value)}
-                className="w-full border-2 border-border bg-secondary-background px-4 py-3 font-base text-sm shadow-shadow focus:outline-none focus:ring-2 focus:ring-main transition-all"
+                className="h-auto px-4 py-3 shadow-shadow"
               />
               {!birthTime && (
                 <p className="font-base text-[10px] leading-tight text-muted-foreground italic">
@@ -115,15 +118,15 @@ export function ChartForm({
 
         {/* Cidade de Nascimento */}
         <div className="space-y-3">
-          <label
+          <Label
             htmlFor="nascimento-cidade"
-            className="font-heading text-sm font-black uppercase tracking-wider text-foreground"
+            className="font-black uppercase tracking-wider text-foreground"
           >
             Cidade de nascimento *
-          </label>
+          </Label>
           <div className="flex flex-col gap-3 sm:flex-row">
             <div className="relative flex-1">
-              <input
+              <Input
                 id="nascimento-cidade"
                 type="text"
                 required
@@ -131,12 +134,12 @@ export function ChartForm({
                 value={cityName}
                 onChange={e => handleCityChange(e.target.value)}
                 placeholder="Ex: São Paulo"
-                className="w-full border-2 border-border bg-secondary-background px-4 py-3 font-base text-sm shadow-shadow focus:outline-none focus:ring-2 focus:ring-main transition-all"
+                className="h-auto px-4 py-3 shadow-shadow"
               />
             </div>
             <Button
               type="button"
-              variant="outline"
+              variant="neutral"
               size="lg"
               className="w-full sm:w-auto"
               onClick={() => geo.search(cityName)}
@@ -193,9 +196,9 @@ export function ChartForm({
         <div className="pt-4">
           <Button
             type="submit"
-            variant="cosmic"
+            variant="neutral"
             size="lg"
-            className="w-full md:w-auto md:min-w-[240px]"
+            className="w-full bg-cosmic-blue md:w-auto md:min-w-[240px]"
             disabled={!birthDate || !lat || !lng || isPending}
           >
             {isPending ? (
@@ -207,6 +210,6 @@ export function ChartForm({
           </Button>
         </div>
       </form>
-    </div>
+    </Card>
   )
 }

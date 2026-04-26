@@ -4,10 +4,14 @@ Este projeto usa **NeoBrutalismo como sistema visual oficial**. Ajustes de layou
 
 ## Fonte de verdade
 
+- Fonte de verdade para agentes: `DESIGN.md`
 - Base local obrigatória: `src/app/globals.css`
-- Referência de componentes: `neobrutalism-components`
-- Referência externa consultiva: `https://context7.com/ekmas/neobrutalism-components/llms.txt?tokens=10000`
-- Context7 library ID: `/ekmas/neobrutalism-components`
+- Referência de componentes: `neobrutalism.dev`
+- Referência externa consultiva: `https://context7.com/websites/neobrutalism_dev/llms.txt?tokens=21933`
+- Context7 library ID: `/websites/neobrutalism_dev`
+- Formato persistente de design system: `https://github.com/google-labs-code/design.md`
+
+`DESIGN.md` descreve a identidade visual em um formato legível por agentes e validável por CLI. O CSS em `src/app/globals.css` continua sendo a implementação runtime; quando ambos divergirem, atualize os dois na mesma mudança.
 
 ## Tokens canônicos
 
@@ -111,16 +115,16 @@ O trecho abaixo documenta os **tokens canônicos** que devem guiar futuras alter
 - Chips excessivamente suaves ou dessaturados
 - CTAs com aparência premium/luxuosa em vez de direta e física
 
-## Uso do `neobrutalism-components`
+## Uso do `neobrutalism.dev`
 
-O pacote/referência `neobrutalism-components` deve ser tratado como **guia de implementação de primitives e padrões visuais** para:
+A referência `neobrutalism.dev` deve ser tratada como **guia de implementação de primitives e padrões visuais** para:
 
 - `Button`
 - `Badge`
 - `Input`
 - `Textarea`
 - `Table`
-- `Menubar` / navegação
+- `NavigationMenu` / navegação
 - `Alert`
 - `Chart` e tokens de gráfico
 

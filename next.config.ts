@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
         hostname: 'imagedelivery.net',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'upload.wikimedia.org',
+        pathname: '/**',
+      },
     ],
   },
   async headers() {
@@ -25,7 +30,7 @@ const nextConfig: NextConfig = {
       {
         // A página contém dados pessoais via query string; previews públicos
         // devem usar as rotas OG assinadas em vez de cachear o HTML completo.
-        source: '/mapa-astral',
+        source: '/mapa-astral/:path*',
         headers: [
           { key: 'Cache-Control', value: 'private, no-store' },
         ],

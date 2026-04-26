@@ -19,7 +19,7 @@ export function Footer() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Abrir perfil @Gayaliz_ no X em nova aba"
-            className="group flex items-center gap-2 border-2 border-border bg-main px-4 py-2 font-heading text-sm font-black uppercase text-main-foreground shadow-shadow transition-all hover:translate-x-1 hover:translate-y-1 hover:shadow-none"
+            className="group flex min-h-[44px] items-center gap-2 border-2 border-border bg-main px-4 py-2 font-heading text-sm font-black uppercase text-main-foreground shadow-shadow transition-all hover:translate-x-1 hover:translate-y-1 hover:shadow-none"
           >
             <span>Twitter</span>
             <span className="text-lg leading-none transition-transform group-hover:rotate-12">↗</span>

@@ -8,10 +8,12 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 Este projeto usa **NeoBrutalismo** como sistema visual oficial.
 
+- Fonte de verdade para agentes: `DESIGN.md`
 - Fonte de verdade: `docs/design/neobrutalism-system.md`
 - Base local: `src/app/globals.css`
-- Referência de componentes: `/ekmas/neobrutalism-components`
-- Referência consultiva: `https://context7.com/ekmas/neobrutalism-components/llms.txt?tokens=10000`
+- Referência de componentes: `neobrutalism.dev`
+- Referência consultiva: `https://context7.com/websites/neobrutalism_dev/llms.txt?tokens=21933`
+- Formato persistente: `https://github.com/google-labs-code/design.md`
 
 Ao refatorar UI:
 
@@ -19,3 +21,4 @@ Ao refatorar UI:
 - preserve a presença física de cards, botões, inputs, badges e tabelas
 - não substitua a linguagem NeoBrutalist por uma estética editorial suave, glassy ou minimalista lavada
 - melhorias de hierarquia, legibilidade e espaçamento são desejadas, mas devem continuar claramente neobrutalist
+- rode `npm run design:lint` quando alterar tokens, componentes globais ou regras visuais em `DESIGN.md`

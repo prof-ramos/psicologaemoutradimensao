@@ -7,9 +7,9 @@ describe('Badge', () => {
     expect(screen.getByText('psicologia')).toBeInTheDocument()
   })
 
-  it('aplica variant blue', () => {
-    render(<Badge variant="blue">cosmos</Badge>)
-    expect(screen.getByText('cosmos')).toHaveClass('bg-cosmic-blue')
+  it('aplica variant neutral', () => {
+    render(<Badge variant="neutral">cosmos</Badge>)
+    expect(screen.getByText('cosmos')).toHaveClass('bg-secondary-background')
   })
 
   it('aplica variant padrão quando nenhum variant é passado', () => {

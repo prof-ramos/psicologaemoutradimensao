@@ -9,10 +9,12 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "NODE_ENV=production next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "design:lint": "design.md lint DESIGN.md",
+    "design:export:tailwind": "design.md export --format tailwind DESIGN.md",
     "knip": "knip",
     "test": "jest",
     "deploy": "npx vercel --prod",
@@ -21,6 +23,8 @@
   },
   "dependencies": {
     "@astrodraw/astrochart": "^3.0.2",
+    "@radix-ui/react-label": "^2.1.8",
+    "@radix-ui/react-navigation-menu": "^1.2.14",
     "@radix-ui/react-slot": "^1.2.4",
     "@wisp-cms/client": "^0.0.23",
     "circular-natal-horoscope-js": "^1.1.0",
@@ -36,6 +40,7 @@
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
+    "@google/design.md": "^0.1.1",
     "@jest/globals": "^30.3.0",
     "@playwright/test": "^1.59.1",
     "@tailwindcss/postcss": "^4.2.4",
@@ -49,6 +54,7 @@
     "@types/react-dom": "^19",
     "@types/rss": "^0.0.32",
     "@types/sanitize-html": "^2.16.1",
+    "@vercel/config": "^0.0.32",
     "eslint": "^9.39.4",
     "eslint-config-next": "16.2.4",
     "jest": "^30.3.0",

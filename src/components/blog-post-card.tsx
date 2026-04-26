@@ -1,4 +1,3 @@
-import type { BadgeProps } from '@/components/ui/badge'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
@@ -6,7 +5,7 @@ import { ptBR } from 'date-fns/locale'
 import Image from 'next/image'
 import Link from 'next/link'
 
-const TAG_VARIANTS: Array<BadgeProps['variant']> = ['blue', 'pink', 'orange', 'default']
+const TAG_CLASSES = ['bg-cosmic-blue', 'bg-vibrant-pink', 'bg-electric-orange', 'bg-main']
 
 interface Tag {
   id: string
@@ -48,7 +47,7 @@ export function BlogPostCard({ post }: { post: Post }) {
       {post.tags.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {post.tags.map((tag, i) => (
-            <Badge key={tag.id} variant={TAG_VARIANTS[i % TAG_VARIANTS.length]}>
+            <Badge key={tag.id} className={TAG_CLASSES[i % TAG_CLASSES.length]}>
               {tag.name}
             </Badge>
           ))}

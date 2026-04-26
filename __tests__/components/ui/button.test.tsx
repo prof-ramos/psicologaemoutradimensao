@@ -27,8 +27,8 @@ describe('Button', () => {
     expect(onClick).not.toHaveBeenCalled()
   })
 
-  it('renderiza com variant outline', () => {
-    render(<Button variant="outline">Outline</Button>)
+  it('renderiza com variant neutral', () => {
+    render(<Button variant="neutral">Neutral</Button>)
     expect(screen.getByRole('button')).toBeInTheDocument()
   })
 

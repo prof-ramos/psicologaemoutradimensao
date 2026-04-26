@@ -1,10 +1,12 @@
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import type { HoroscopeResult } from '@/lib/horoscope'
 import { format, parseISO } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { MessageCircle, X } from 'lucide-react'
+import { ArrowRight, CalendarDays, MessageCircle, X } from 'lucide-react'
+import Link from 'next/link'
 
-const ASPECT_VARIANTS = ['default', 'blue', 'pink', 'orange'] as const
+const ASPECT_CLASSES = ['bg-main', 'bg-cosmic-blue', 'bg-vibrant-pink', 'bg-electric-orange']
 
 interface ChartDetailsProps {
   data: HoroscopeResult
@@ -17,8 +19,10 @@ interface ChartDetailsProps {
 
 export function ChartDetails({ data, cidade, dataStr, hora, twitterMessage, whatsappMessage }: ChartDetailsProps) {
   let formattedDate = '—'
+  let seuDiaHref = '/seu-dia'
   try {
     formattedDate = format(parseISO(dataStr), 'dd/MM/yyyy', { locale: ptBR })
+    seuDiaHref = `/seu-dia?data=${encodeURIComponent(dataStr)}`
   } catch {
     // keep default '—'
   }
@@ -91,6 +95,30 @@ export function ChartDetails({ data, cidade, dataStr, hora, twitterMessage, what
               )}
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Seu Dia CTA */}
+      <div className="border-2 border-border bg-vibrant-pink p-5 shadow-shadow">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1">
+            <p className="inline-flex items-center gap-2 font-heading text-xs font-black uppercase tracking-widest text-foreground/70">
+              <CalendarDays className="h-4 w-4" aria-hidden="true" />
+              Seu Dia
+            </p>
+            <h3 className="font-heading text-xl font-black uppercase leading-tight">
+              Veja o que aconteceu no dia do seu nascimento
+            </h3>
+            <p className="font-base text-sm font-bold leading-snug text-foreground/75">
+              Eventos, nascimentos e mortes marcantes da mesma data.
+            </p>
+          </div>
+          <Button asChild variant="neutral" className="shrink-0 bg-background">
+            <Link href={seuDiaHref}>
+              Abrir Seu Dia
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </Button>
         </div>
       </div>
 
@@ -189,8 +217,7 @@ export function ChartDetails({ data, cidade, dataStr, hora, twitterMessage, what
             {data.aspects.map((asp, i) => (
               <Badge
                 key={`${asp.planet1}-${asp.typePt}-${asp.planet2}`}
-                variant={ASPECT_VARIANTS[i % ASPECT_VARIANTS.length]}
-                className="px-3 py-1.5 text-xs shadow-shadow active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-default"
+                className={`px-3 py-1.5 text-xs shadow-shadow active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-default ${ASPECT_CLASSES[i % ASPECT_CLASSES.length]}`}
               >
                 <span className="opacity-80">{asp.planet1}</span>
                 <span className="mx-1 font-black">{asp.typePt}</span>

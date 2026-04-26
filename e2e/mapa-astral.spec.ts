@@ -4,9 +4,9 @@ test.describe('Mapa Astral — formulário', () => {
   test('renderiza campos e botão de calcular', async ({ page }) => {
     await page.goto('/mapa-astral')
 
-    await expect(page.locator('#nascimento-data')).toBeVisible()
-    await expect(page.locator('#nascimento-hora')).toBeVisible()
-    await expect(page.locator('#nascimento-cidade')).toBeVisible()
+    await expect(page.getByLabel(/Data de nascimento/i)).toBeVisible()
+    await expect(page.getByLabel(/Hora de nascimento/i)).toBeVisible()
+    await expect(page.getByLabel(/Cidade de nascimento/i)).toBeVisible()
     await expect(
       page.getByRole('button', { name: /Calcular Mapa Astral/i })
     ).toBeVisible()
@@ -29,7 +29,7 @@ test.describe('Mapa Astral — formulário', () => {
     })
 
     await page.goto('/mapa-astral')
-    await page.locator('#nascimento-cidade').fill('São Paulo')
+    await page.getByLabel(/Cidade de nascimento/i).fill('São Paulo')
     await page.getByRole('button', { name: /Buscar/i }).click()
 
     await expect(page.getByRole('listbox')).toBeVisible()
@@ -46,6 +46,9 @@ test.describe('Mapa Astral — resultado', () => {
     await expect(
       page.getByRole('heading', { name: /Seu Céu Natal/i })
     ).toBeVisible()
+    await expect(
+      page.getByRole('link', { name: /Abrir Seu Dia/i })
+    ).toHaveAttribute('href', '/seu-dia?data=1990-03-15')
   })
 
   test('exibe erro com data inválida', async ({ page }) => {

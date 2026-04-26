@@ -5,6 +5,12 @@ import { Menu, X } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+} from './ui/navigation-menu'
 
 interface NavbarProps {
   name: string
@@ -13,6 +19,7 @@ interface NavbarProps {
 const NAV_ITEMS = [
   { href: '/blog', label: 'Blog' },
   { href: '/mapa-astral', label: 'Mapa Astral' },
+  { href: '/seu-dia', label: 'Seu Dia' },
   { href: '/contato', label: 'Contato' },
 ]
 
@@ -23,40 +30,45 @@ export function Navbar({ name }: NavbarProps) {
   return (
     <header className="border-b-2 border-border bg-main shadow-shadow sticky top-0 z-50">
       <nav aria-label="Main navigation" className="mx-auto max-w-6xl px-4 py-3 md:py-4">
-        <div className="flex items-center justify-between">
+        <div className="flex min-w-0 items-center justify-between gap-3">
           <Link
             href="/"
             onClick={() => setOpen(false)}
-            className="font-heading text-xl font-black text-main-foreground hover:translate-x-[2px] hover:translate-y-[2px] transition-transform active:translate-x-[4px] active:translate-y-[4px]"
+            className="min-w-0 max-w-[calc(100%-56px)] truncate py-2 font-heading text-lg font-black text-main-foreground transition-transform hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] sm:text-xl md:max-w-none"
           >
             {name}
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-8">
-            {NAV_ITEMS.map((item) => {
-              const isActive = pathname === item.href
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  aria-current={isActive ? 'page' : undefined}
-                  className={cn(
-                    'px-3 py-1.5 font-heading text-sm font-black uppercase tracking-tight transition-all',
-                    isActive
-                      ? 'bg-foreground text-background border-2 border-border shadow-shadow -translate-x-1 -translate-y-1'
-                      : 'text-main-foreground hover:bg-foreground/5'
-                  )}
-                >
-                  {item.label}
-                </Link>
-              )
-            })}
-          </div>
+          <NavigationMenu viewport={false} className="hidden flex-none border-0 bg-transparent p-0 md:flex">
+            <NavigationMenuList className="gap-6 space-x-0">
+              {NAV_ITEMS.map((item) => {
+                const isActive = pathname === item.href
+                return (
+                  <NavigationMenuItem key={item.href}>
+                    <NavigationMenuLink asChild>
+                      <Link
+                        href={item.href}
+                        aria-current={isActive ? 'page' : undefined}
+                        className={cn(
+                          'px-3 py-1.5 font-heading text-sm font-black uppercase tracking-tight transition-all',
+                          isActive
+                            ? 'bg-foreground text-background border-2 border-border shadow-shadow -translate-x-1 -translate-y-1'
+                            : 'text-main-foreground hover:bg-foreground/5'
+                        )}
+                      >
+                        {item.label}
+                      </Link>
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                )
+              })}
+            </NavigationMenuList>
+          </NavigationMenu>
 
           {/* Mobile hamburger */}
           <button
-            className="md:hidden flex h-9 w-9 items-center justify-center border-2 border-border bg-background shadow-shadow transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+            className="flex h-[44px] w-[44px] shrink-0 items-center justify-center border-2 border-border bg-background shadow-shadow transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none md:hidden"
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
             aria-controls="mobile-menu"
