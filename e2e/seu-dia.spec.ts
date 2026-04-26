@@ -11,7 +11,7 @@ test.describe('Seu Dia — formulário', () => {
   })
 
   test('renderiza campo de data e botão de envio', async ({ page }) => {
-    await expect(page.locator('#nascimento-data')).toBeVisible()
+    await expect(page.getByLabel(/Data de nascimento/i)).toBeVisible()
     await expect(
       page.getByRole('button', { name: /Descobrir Meu Dia/i })
     ).toBeVisible()
@@ -25,22 +25,22 @@ test.describe('Seu Dia — formulário', () => {
 
   test('link "Seu Dia" no navbar navega para /seu-dia', async ({ page }) => {
     await page.goto('/')
-    await page.getByRole('link', { name: /Seu Dia/i }).click()
+    await page.getByRole('link', { name: 'Seu Dia', exact: true }).click()
     await expect(page).toHaveURL('/seu-dia')
   })
 
   test('submit com data válida redireciona para URL com param data', async ({ page }) => {
-    await page.locator('#nascimento-data').fill('1990-04-22')
+    await page.getByLabel(/Data de nascimento/i).fill('1990-04-22')
     await page.getByRole('button', { name: /Descobrir Meu Dia/i }).click()
     await expect(page).toHaveURL(/\/seu-dia\?data=1990-04-22/)
   })
 
   test('não exibe seções de resultado sem params na URL', async ({ page }) => {
     await expect(
-      page.getByRole('heading', { name: 'Eventos Históricos' })
+      page.getByRole('heading', { name: 'Eventos do dia' })
     ).not.toBeVisible()
     await expect(
-      page.getByRole('heading', { name: 'Nascimentos' })
+      page.getByRole('heading', { name: 'Nasceram neste dia' })
     ).not.toBeVisible()
   })
 })
@@ -59,24 +59,24 @@ test.describe('Seu Dia — resultado (API real)', () => {
   })
 
   test('campo de data está pré-preenchido com a data da URL', async ({ page }) => {
-    await expect(page.locator('#nascimento-data')).toHaveValue('1990-04-22')
+    await expect(page.getByLabel(/Data de nascimento/i)).toHaveValue('1990-04-22')
   })
 
-  test('seção "Eventos Históricos" é exibida', async ({ page }) => {
+  test('seção "Eventos do dia" é exibida', async ({ page }) => {
     await expect(
-      page.getByRole('heading', { name: 'Eventos Históricos' })
+      page.getByRole('heading', { name: 'Eventos do dia' })
     ).toBeVisible({ timeout: 15000 })
   })
 
-  test('seção "Nascimentos" é exibida', async ({ page }) => {
+  test('seção "Nasceram neste dia" é exibida', async ({ page }) => {
     await expect(
-      page.getByRole('heading', { name: 'Nascimentos' })
+      page.getByRole('heading', { name: 'Nasceram neste dia' })
     ).toBeVisible({ timeout: 15000 })
   })
 
-  test('seção "Mortes" é exibida', async ({ page }) => {
+  test('seção "Morreram neste dia" é exibida', async ({ page }) => {
     await expect(
-      page.getByRole('heading', { name: 'Mortes' })
+      page.getByRole('heading', { name: 'Morreram neste dia' })
     ).toBeVisible({ timeout: 15000 })
   })
 
@@ -88,18 +88,18 @@ test.describe('Seu Dia — resultado (API real)', () => {
   })
 })
 
-test.describe('Seu Dia — seção "Neste dia"', () => {
+test.describe('Seu Dia — seção "No seu ano"', () => {
   // 20/07/1969 = pouso lunar (Apollo 11): evento de 1969 está na API da Wikipedia
   // para esse dia → exactDayEvents ≥ 1 → ExactDaySection renderiza.
-  // O componente exibe "Aconteceu neste dia" (p) + "em {year}" (h3) como dois
-  // elementos separados — não há uma string unificada "Neste dia, em 1969".
-  test('exibe seção "Aconteceu neste dia" para 20 de julho de 1969', async ({ page }) => {
+  // O componente exibe "No seu ano" (p) + "Aconteceu em {year}" (h3) como dois
+  // elementos separados.
+  test('exibe seção "No seu ano" para 20 de julho de 1969', async ({ page }) => {
     await page.goto('/seu-dia?data=1969-07-20')
     await expect(
-      page.getByText('Aconteceu neste dia')
+      page.getByText('No seu ano')
     ).toBeVisible({ timeout: 15000 })
     await expect(
-      page.getByRole('heading', { name: /em 1969/i })
+      page.getByRole('heading', { name: /Aconteceu em 1969/i })
     ).toBeVisible()
   })
 })
