@@ -59,20 +59,24 @@ src/
     layout.tsx              ← Layout raiz: Navbar + Footer + fontes Google
     page.tsx                ← Home: últimos 6 posts do WISP
     globals.css             ← Tokens Tailwind v4 (@theme), animações
+    global-error.tsx        ← Error boundary global (client component)
     icon.png                ← Favicon (192×192)
     apple-icon.png          ← Apple touch icon (180×180)
     blog/
-      page.tsx              ← Listagem paginada (?page=N)
+      page.tsx              ← Listagem paginada (?page=N) com error handling
+      loading.tsx           ← Skeleton de loading para o blog
       [slug]/page.tsx       ← Post individual com ISR (revalidate=3600)
       sitemap.ts            ← /blog/sitemap.xml
     mapa-astral/
       page.tsx              ← Página do Mapa Astral (Server Component)
+      loading.tsx           ← Skeleton de loading para o mapa astral
       chart-form.tsx        ← Formulário de entrada (Client Component)
       chart-svg.tsx         ← Roda zodiacal via @astrodraw/astrochart
       chart-svg-wrapper.tsx ← Wrapper client para o gráfico
       chart-details.tsx     ← Tabela de posições, aspectos, ASC/MC
     seu-dia/
       page.tsx              ← Página "Seu Dia" (Server Component)
+      loading.tsx           ← Skeleton de loading para o Seu Dia
       date-form.tsx         ← Formulário de data (Client Component)
       day-results.tsx       ← Cards de eventos/nascimentos/mortes + ExactDaySection
     contato/page.tsx        ← Link para https://x.com/Gayaliz_
@@ -81,9 +85,9 @@ src/
       revalidate/route.ts   ← POST /api/revalidate (body: { secret })
     rss/route.ts            ← Feed RSS XML
   components/
-    navbar.tsx              ← Header fundo #ccff00, links Blog + Contato
+    navbar.tsx              ← Header fundo #ccff00, hamburger menu mobile (client component)
     footer.tsx              ← Footer fundo preto, link @Gayaliz_
-    blog-post-card.tsx      ← Card neobrutalism com sombra sólida
+    blog-post-card.tsx      ← Card neobrutalism com sombra sólida + prop priority
     blog-post-content.tsx   ← HTML sanitizado do WISP
     blog-posts-pagination.tsx ← Prev/next com useSearchParams
     ui/
@@ -158,6 +162,24 @@ page.tsx (Server) → calculateHoroscope(input) → HoroscopeResult
 ChartSVGWrapper  → @astrodraw/astrochart (useEffect no cliente)
 ChartDetails     → tabela de posições + ASC/MC + aspectos
 ```
+
+### Navbar — hamburger menu mobile
+
+A Navbar (`src/components/navbar.tsx`) é um **Client Component** (`'use client'`) que usa:
+- `usePathname()` para indicar rota ativa
+- `useState` para abrir/fechar o menu mobile
+- Ícones `Menu` e `X` do Lucide para o botão hamburger
+
+Links de navegação: Blog, Mapa Astral, Seu Dia, Contato. A `navigation-menu.tsx` do Radix foi removida — substituída por implementação customizada simples.
+
+### Loading skeletons
+
+Cada rota principal tem um `loading.tsx` do Next.js App Router que exibe skeleton em neobrutalism durante o carregamento:
+- `src/app/blog/loading.tsx` — grid de cards com `animate-pulse`
+- `src/app/mapa-astral/loading.tsx` — skeleton do formulário e seção hero
+- `src/app/seu-dia/loading.tsx` — skeleton do formulário e seção hero
+
+O `global-error.tsx` captura erros de nível de layout com botão "Tentar novamente".
 
 ### Tema neobrutalism
 
@@ -317,3 +339,34 @@ afterEach(() => { (global as any).fetch = orig })
 npx tsc --noEmit   # checar erros sem gerar output
 npm run build      # build completo
 ```
+
+---
+
+## 6. Próximas Melhorias Planejadas
+
+### Melhorias no "Seu Dia" (spec: `docs/superpowers/specs/2026-04-23-seu-dia-melhorias-design.md`)
+
+Plan em: `docs/superpowers/plans/2026-04-23-seu-dia-melhorias.md`
+
+**Status:** Não iniciado. Todas as tasks estão pendentes.
+
+Três features planejadas:
+
+1. **Filtros por categoria** (`FilterTabs`) — segmented control client-side para filtrar entre Todos / Meu Ano / Eventos / Nascimentos / Mortes.
+2. **Botão de compartilhar** (`ShareBar`) — copiar link (`navigator.clipboard`) e download de card PNG (`html-to-image`).
+3. **Animações** — shimmer skeleton (`SkeletonCard`), stagger reveal melhorado, confetti com `canvas-confetti` quando `exactDayEvents.length > 0`.
+
+**Dependências a instalar antes de implementar:**
+```bash
+npm install html-to-image canvas-confetti
+npm install -D @types/canvas-confetti
+```
+
+**Novos arquivos:**
+- `src/components/ui/seu-dia/filter-tabs.tsx`
+- `src/components/ui/seu-dia/share-bar.tsx`
+- `src/components/ui/seu-dia/confetti-trigger.tsx`
+- `src/components/ui/seu-dia/skeleton-card.tsx`
+- `src/components/ui/seu-dia/share-card.tsx`
+
+**Arquivo a modificar:** `src/app/seu-dia/day-results.tsx` → virar Client Component com `useState` para filtro + `useRef` para PNG.
