@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { getBlogPostsPage } from '@/features/blog'
 import { BlogPostCard } from '@/components/blog-post-card'
 import { BlogPostsPagination } from '@/components/blog-posts-pagination'
@@ -40,17 +41,19 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       {posts.length > 0 ? (
         <>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {posts.map((post) => (
-              <BlogPostCard key={post.id} post={post} />
+            {posts.map((post, i) => (
+              <BlogPostCard key={post.id} post={post} priority={i === 0} />
             ))}
           </div>
-          <BlogPostsPagination
-            pagination={{
-              page: pagination.page,
-              totalPosts: pagination.totalPosts,
-              limit: typeof pagination.limit === 'number' ? pagination.limit : limit,
-            }}
-          />
+          <Suspense>
+            <BlogPostsPagination
+              pagination={{
+                page: pagination.page,
+                totalPosts: pagination.totalPosts,
+                limit: typeof pagination.limit === 'number' ? pagination.limit : limit,
+              }}
+            />
+          </Suspense>
         </>
       ) : fetchError ? (
         <div role="alert" aria-live="assertive" className="border-2 border-border bg-vibrant-pink p-4 shadow-shadow">

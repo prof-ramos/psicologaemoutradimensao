@@ -167,8 +167,8 @@ export default async function HomePage() {
             </div>
           ) : posts.length > 0 ? (
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {posts.map((post) => (
-                <BlogPostCard key={post.id} post={post} />
+              {posts.map((post, i) => (
+                <BlogPostCard key={post.id} post={post} priority={i === 0} />
               ))}
             </div>
           ) : (
