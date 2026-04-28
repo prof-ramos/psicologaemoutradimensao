@@ -5,12 +5,6 @@ import { Menu, X } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-} from './ui/navigation-menu'
 
 interface NavbarProps {
   name: string
@@ -40,31 +34,26 @@ export function Navbar({ name }: NavbarProps) {
           </Link>
 
           {/* Desktop nav */}
-          <NavigationMenu viewport={false} className="hidden flex-none border-0 bg-transparent p-0 md:flex">
-            <NavigationMenuList className="gap-6 space-x-0">
-              {NAV_ITEMS.map((item) => {
-                const isActive = pathname === item.href
-                return (
-                  <NavigationMenuItem key={item.href}>
-                    <NavigationMenuLink asChild>
-                      <Link
-                        href={item.href}
-                        aria-current={isActive ? 'page' : undefined}
-                        className={cn(
-                          'px-3 py-1.5 font-heading text-sm font-black uppercase tracking-tight transition-all',
-                          isActive
-                            ? 'bg-foreground text-background border-2 border-border shadow-shadow -translate-x-1 -translate-y-1'
-                            : 'text-main-foreground hover:bg-foreground/5'
-                        )}
-                      >
-                        {item.label}
-                      </Link>
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
-                )
-              })}
-            </NavigationMenuList>
-          </NavigationMenu>
+          <div className="hidden items-center gap-6 md:flex">
+            {NAV_ITEMS.map((item) => {
+              const isActive = pathname === item.href
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={cn(
+                    'px-3 py-1.5 font-heading text-sm font-black uppercase tracking-tight transition-all',
+                    isActive
+                      ? 'bg-foreground text-background border-2 border-border shadow-shadow -translate-x-1 -translate-y-1'
+                      : 'text-main-foreground hover:bg-foreground/5'
+                  )}
+                >
+                  {item.label}
+                </Link>
+              )
+            })}
+          </div>
 
           {/* Mobile hamburger */}
           <button
