@@ -33,7 +33,7 @@ vercel link          # vincula ao projeto existente
 vercel env pull .env.local
 
 # 4. Rodar localmente
-npm run dev          # http://localhost:3000 com Turbopack
+npm run dev          # http://localhost:3000
 ```
 
 ### Variáveis de ambiente
@@ -46,7 +46,7 @@ Ver `.env.example` para o template completo. Vars obrigatórias em `.env.local`:
 | `NEXT_PUBLIC_BASE_URL` | URL base da aplicação |
 | `NEXT_PUBLIC_BLOG_DISPLAY_NAME` | Nome exibido no blog |
 | `NEXT_PUBLIC_BLOG_DESCRIPTION` | Descrição para SEO |
-| `OG_IMAGE_SECRET` | Segredo HMAC para URLs de OG image |
+| `OG_IMAGE_SECRET` | Segredo HMAC para URLs de OG image do Mapa Astral |
 | `REVALIDATION_SECRET` | Segredo para revalidação on-demand |
 
 ---
@@ -60,6 +60,7 @@ src/
     page.tsx                ← Home: últimos 6 posts do WISP
     globals.css             ← Tokens Tailwind v4 (@theme), animações
     global-error.tsx        ← Error boundary global (client component)
+    robots.ts               ← Gera /robots.txt
     icon.png                ← Favicon (192×192)
     apple-icon.png          ← Apple touch icon (180×180)
     blog/
@@ -74,14 +75,18 @@ src/
       chart-svg.tsx         ← Roda zodiacal via @astrodraw/astrochart
       chart-svg-wrapper.tsx ← Wrapper client para o gráfico
       chart-details.tsx     ← Tabela de posições, aspectos, ASC/MC
+      use-geocode.ts        ← Hook useGeocode() — busca de cidade via /api/geocode
     seu-dia/
       page.tsx              ← Página "Seu Dia" (Server Component)
       loading.tsx           ← Skeleton de loading para o Seu Dia
       date-form.tsx         ← Formulário de data (Client Component)
       day-results.tsx       ← Cards de eventos/nascimentos/mortes + ExactDaySection
+      wiki-thumbnail.tsx    ← Client component: <Image> com fallback de erro (Wikipedia)
     contato/page.tsx        ← Link para https://x.com/Gayaliz_
     api/
       geocode/route.ts      ← GET /api/geocode?q=... (proxy Nominatim)
+      og/route.tsx          ← GET /api/og — OG image do Mapa Astral (next/og + HMAC)
+      og/site/route.tsx     ← GET /api/og/site — OG image genérica do site
       revalidate/route.ts   ← POST /api/revalidate (body: { secret })
     rss/route.ts            ← Feed RSS XML
   components/
@@ -93,75 +98,129 @@ src/
     ui/
       button.tsx            ← Button neobrutalism (CVA)
       badge.tsx             ← Badge 4 variantes: default/blue/pink/orange
+      card.tsx              ← Card neobrutalism (rounded-base, shadow-shadow, border-2)
+      input.tsx             ← Input neobrutalism
+      label.tsx             ← Label via Radix LabelPrimitive
   lib/
-    wisp.ts                 ← Instância do buildWispClient
     utils.ts                ← cn() — tailwind-merge + clsx
-    og-image.ts             ← Gera URL de OG image com HMAC
+    og-image.ts             ← signMapaAstralOgUrl() — gera URL OG com HMAC
     horoscope.ts            ← calculateHoroscope() — cálculos astrológicos
     horoscope-i18n.ts       ← Traduções pt-BR de planetas, signos, aspectos
+    geocode-validation.ts   ← validateGeocodeQuery() + MAX_QUERY_LENGTH
   features/
+    blog/
+      client.ts             ← getWispClient() — singleton do buildWispClient
+      service.ts            ← getAllBlogPosts, getBlogPostBySlug, getRecentBlogPosts (unstable_cache)
+      index.ts              ← barrel
+    mapa-astral/
+      query.ts              ← parseMapaAstralParams() → ValidMapaAstralParams | empty | invalid
+      service.ts            ← getMapaAstralResult() — chama calculateHoroscope()
+      metadata.ts           ← buildMapaAstralMetadata(), verifyMapaAstralOgSignature()
+      share.ts              ← buildMapaAstralShareMessages() — URLs Twitter/WhatsApp
+      ui.ts                 ← createMapaAstralPageState() — monta estado da página
+      index.ts              ← barrel
+    og/
+      assets.ts             ← ogAssets, getOgFontOptions() — carrega fonte TTF para OG images
     seu-dia/
       types.ts              ← WikiPage, WikiEvent, OnThisDayResult, ValidSeuDiaParams
       query.ts              ← parseSeuDiaParams() → { kind: 'empty'|'invalid'|'valid' }
       service.ts            ← fetchOnThisDay(month, day, birthYear?) — Wikipedia API, revalidate 86400
       index.ts              ← barrel
-  config.ts                 ← Lê e valida env vars; exporta config tipada
+  config.ts                 ← Barrel: re-exporta todos os módulos de src/config/
+  config/
+    shared.ts               ← readTrimmedEnv() — utilitário base de leitura de env vars
+    cms.ts                  ← cmsConfig — NEXT_PUBLIC_BLOG_ID
+    integrations.ts         ← integrationsConfig — REVALIDATION_SECRET
+    og.ts                   ← ogConfig — OG_IMAGE_SECRET
+    site.ts                 ← siteConfig — nome, descrição, baseUrl
+  assets/
+    fonts/og-font.ttf       ← Fonte TTF usada nas OG images geradas server-side
 
 __tests__/
   config.test.ts
+  config-domains.test.ts
   utils.test.ts
   lib/horoscope.test.ts
-  api/revalidate.test.ts
+  api/
+    geocode.test.ts
+    revalidate.test.ts
+  features/
+    blog-service.test.ts
+    mapa-astral-query.test.ts
+    mapa-astral-service.test.ts
+    mapa-astral-share.test.ts
+    seu-dia-query.test.ts
   components/
     navbar.test.tsx
     footer.test.tsx
     blog-post-card.test.tsx
-    blog-posts-pagination.test.tsx  (se existir)
+    chart-form.test.tsx
+    day-results.test.tsx
     ui/button.test.tsx
     ui/badge.test.tsx
-    chart-form.test.tsx
 
 e2e/
-  seu-dia.spec.ts           ← Testes Playwright para /seu-dia (13 testes, API real)
+  home.spec.ts
+  blog.spec.ts
+  mapa-astral.spec.ts
+  seu-dia.spec.ts           ← usa datas âncora determinísticas (ex: 1969-07-20)
 ```
 
 ### Dependências-chave
 
 | Pacote | Papel |
 | --- | --- |
-| `@wisp-cms/client` | Fetch de posts do CMS |
+| `@wisp-cms/client` | Fetch de posts do CMS (instanciado via `features/blog/client.ts`) |
 | `circular-natal-horoscope-js` | Cálculos astrológicos |
 | `@astrodraw/astrochart` | Renderização da roda zodiacal em SVG |
 | `date-fns` | Formatação de datas em pt-BR |
 | `sanitize-html` | Sanitiza HTML dos posts |
 | `rss` | Gera feed RSS |
+| `lucide-react` | Ícones (Menu, X na Navbar; outros) |
 | `@playwright/test` | Testes E2E (suíte `e2e/`) |
 
 ---
 
 ## 3. Fluxo de trabalho de desenvolvimento
 
+### Comandos principais
+
+```bash
+npm run dev           # servidor local em http://localhost:3000
+npm run build         # build de produção
+npm run start         # serve o build local
+npm run lint          # ESLint
+npm run lint:fix      # ESLint com auto-fix
+npm run knip          # detecta exports/imports não utilizados
+npm run test          # Jest (unit + component)
+npm run test:e2e      # Playwright E2E
+npm run test:e2e:ui   # Playwright modo interativo
+npm run deploy        # vercel --prod (deploy direto para produção)
+```
+
 ### Stack de rendering
 
 ```text
-Server Components (padrão) → dados do WISP, cálculos astrológicos
-Client Components ('use client') → chart-form, chart-svg, blog-posts-pagination
+Server Components (padrão) → dados do WISP, cálculos astrológicos, Wikipedia API
+Client Components ('use client') → chart-form, chart-svg, blog-posts-pagination, date-form, wiki-thumbnail
 ```
-
-A página do Mapa Astral (`/mapa-astral`) é Server Component:
-lê `searchParams`, chama `calculateHoroscope()` e passa os dados já
-calculados para os Client Components.
 
 ### Mapa Astral — fluxo de dados
 
 ```text
 URL: /mapa-astral?data=1990-03-15&hora=14:30&lat=-23.55&lng=-46.63&cidade=São Paulo
          ↓
-page.tsx (Server) → calculateHoroscope(input) → HoroscopeResult
+page.tsx (Server) → parseMapaAstralParams() → ValidMapaAstralParams
+         ↓
+getMapaAstralResult() → calculateHoroscope() → HoroscopeResult
          ↓
 ChartSVGWrapper  → @astrodraw/astrochart (useEffect no cliente)
 ChartDetails     → tabela de posições + ASC/MC + aspectos
+share.ts         → buildMapaAstralShareMessages() → URLs Twitter/WhatsApp
 ```
+
+O `use-geocode.ts` (`mapa-astral/use-geocode.ts`) é um hook client-side que chama
+`/api/geocode` para converter nome de cidade em lat/lng no formulário.
 
 ### Navbar — hamburger menu mobile
 
@@ -185,9 +244,8 @@ O `global-error.tsx` captura erros de nível de layout com botão "Tentar novame
 
 O sistema visual oficial é **NeoBrutalismo**.
 
-- Fonte de verdade: `docs/design/neobrutalism-system.md`
+- Fonte de verdade: `DESIGN.md` (raiz do projeto) e `docs/design/neobrutalism-system.md`
 - Base local: `src/app/globals.css`
-- Referência externa: `https://context7.com/ekmas/neobrutalism-components/llms.txt?tokens=10000`
 - Context7 library ID: `/ekmas/neobrutalism-components`
 
 Princípios não negociáveis:
@@ -198,6 +256,15 @@ Princípios não negociáveis:
 - `radius-base` contido, sem arredondamento excessivo
 - componentes com presença física e leitura direta
 - hierarquia visual pode evoluir, mas sem abandonar o caráter neobrutalist
+
+### OG Images
+
+Dois endpoints de OG image gerados server-side com `next/og`:
+- `/api/og` — OG image do Mapa Astral (personalizda por usuário, assinada com HMAC)
+- `/api/og/site` — OG image genérica do site
+
+A fonte TTF (`src/assets/fonts/og-font.ttf`) é carregada via `features/og/assets.ts` usando `fs` (server-only).
+A URL do `/api/og` é assinada com `OG_IMAGE_SECRET` via `lib/og-image.ts` para evitar geração não autorizada.
 
 ### Seu Dia — fluxo de dados
 
@@ -211,6 +278,7 @@ fetchOnThisDay(month, day, birthYear) → OnThisDayResult
          ↓
 DayResults → ExactDaySection (bg-foreground invertido, só exibe se exactDayEvents.length > 0)
            → Section('events') / Section('births') / Section('deaths')
+           → WikiThumbnail (client component com fallback de erro)
 ```
 
 **Importante:** A API da Wikipedia é chamada server-side (`next: { revalidate: 86400 }`).
@@ -229,12 +297,6 @@ Posts novos no WISP aparecem automaticamente em até 1h
 curl -X POST https://psicologaemoutradimensao.vercel.app/api/revalidate \
   -H "Content-Type: application/json" \
   -d '{"secret":"SEU_REVALIDATION_SECRET"}'
-```
-
-### Deploy
-
-```bash
-vercel --prod     # deploy direto para produção
 ```
 
 ---
@@ -269,20 +331,26 @@ npx jest --no-coverage        # mais rápido, sem relatório de cobertura
 | Arquivo | O que verifica |
 | --- | --- |
 | `config.test.ts` | Falha com env var ausente; retorna config correta |
+| `config-domains.test.ts` | Configs individuais: cms, og, site, integrations |
 | `horoscope.test.ts` | Posições válidas; signos pt-BR; ASC/MC com hora |
+| `api/geocode.test.ts` | validateGeocodeQuery() + rota GET /api/geocode |
+| `features/mapa-astral-*.test.ts` | parseMapaAstralParams, getMapaAstralResult, buildMapaAstralShareMessages |
+| `features/seu-dia-query.test.ts` | parseSeuDiaParams() |
+| `features/blog-service.test.ts` | Funções do blog service |
 | `button.test.tsx` | Classe `bg-main`, `border-2`, disabled state |
 | `badge.test.tsx` | Classe `bg-cosmic-blue` no variant blue |
 | `chart-form.test.tsx` | Campos, submit, navegação e busca de cidade |
 | `blog-post-card.test.tsx` | Título, descrição, link `/blog/[slug]`, tag |
+| `day-results.test.tsx` | DayResults e ExactDaySection |
 
 ### Testes E2E (Playwright)
 
 Ficam em `e2e/`. Requerem servidor rodando (`npm run dev` ou build+start).
 
 ```bash
-npx playwright test              # rodar todos os testes E2E
+npm run test:e2e                 # rodar todos os testes E2E
 npx playwright test e2e/seu-dia  # rodar só o arquivo seu-dia.spec.ts
-npx playwright test --ui         # modo interativo
+npm run test:e2e:ui              # modo interativo
 npx playwright test --headed     # browser visível
 ```
 
@@ -321,6 +389,11 @@ O `@astrodraw/astrochart` exige DOM — só funciona no cliente. Causas comuns:
 Coordenadas floating-point divergem entre server e client. Solução:
 usar `.toFixed(1)` em todos os valores numéricos usados como atributos SVG.
 
+### OG image retorna 403
+
+A rota `/api/og` valida a assinatura HMAC da URL. Se o `OG_IMAGE_SECRET` mudou ou
+a URL foi construída sem `signMapaAstralOgUrl()`, a requisição é rejeitada.
+
 ### Testes falhando por `fetch` undefined
 
 ```ts
@@ -338,6 +411,12 @@ afterEach(() => { (global as any).fetch = orig })
 ```bash
 npx tsc --noEmit   # checar erros sem gerar output
 npm run build      # build completo
+```
+
+### Imports não utilizados / dead code
+
+```bash
+npm run knip       # lista exports e imports não usados no projeto
 ```
 
 ---
