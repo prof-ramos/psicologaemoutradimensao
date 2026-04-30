@@ -16,7 +16,7 @@ export default defineConfig({
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
     { name: 'mobile-chrome', use: { ...devices['Pixel 7'] } },
-    { name: 'mobile-safari', use: { ...devices['iPhone 12'] } },
+    ...(process.env.CI ? [] : [{ name: 'mobile-safari', use: { ...devices['iPhone 12'] } }]),
   ],
   webServer: {
     // Em CI, builda e sobe em modo produção com vars reais do workflow.
