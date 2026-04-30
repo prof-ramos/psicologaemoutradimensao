@@ -23,9 +23,15 @@ test.describe('Seu Dia — formulário', () => {
     await expect(h1).toContainText(/Seu/i)
   })
 
-  test('link "Seu Dia" no navbar navega para /seu-dia', async ({ page }) => {
+  test('link "Seu Dia" no navbar navega para /seu-dia', async ({ page, viewport }) => {
     await page.goto('/')
-    await page.getByRole('link', { name: 'Seu Dia', exact: true }).click()
+    const isMobile = viewport!.width < 768
+    if (isMobile) {
+      await page.getByRole('button', { name: 'Abrir menu' }).click()
+      await page.locator('#mobile-menu').getByRole('link', { name: 'Seu Dia', exact: true }).click()
+    } else {
+      await page.locator('div.hidden.md\\:flex').getByRole('link', { name: 'Seu Dia', exact: true }).click()
+    }
     await expect(page).toHaveURL('/seu-dia')
   })
 
